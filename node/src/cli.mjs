@@ -4,7 +4,7 @@ import { findSessions } from './browsers.mjs';
 import { GhlikeError, NoSessionError, RepoNotFoundError, run } from './core.mjs';
 
 const EXIT_OK = 0, EXIT_ERROR = 1, EXIT_NO_SESSION = 2, EXIT_NOT_FOUND = 3;
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 
 const HELP = `ghlike ${VERSION} — like (star) en GitHub con tu sesión del navegador, sin tokens
 

@@ -32,7 +32,7 @@ export function start(port = DEFAULT_PORT) {
 
     const url = new URL(req.url, 'http://127.0.0.1');
     if (url.pathname === '/ping' && req.method === 'GET') {
-      return reply(200, { ok: true, service: 'ghlike-daemon', version: '0.1.2' });
+      return reply(200, { ok: true, service: 'ghlike-daemon', version: '0.1.3' });
     }
 
     const action = ['toggle', 'star', 'unstar', 'check'].includes(url.pathname.slice(1))

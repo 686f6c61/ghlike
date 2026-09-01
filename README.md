@@ -21,7 +21,7 @@ de tu página**.
 
 | Piece | Package | For whom | What it does |
 |-------|---------|----------|--------------|
-| **Widget** | [`ghlike-widget`](widget/) (npm) | Website owners | The `<gh-like repo="owner/repo">` embeddable button |
+| **Widget** | `ghlike/widget` (same npm package) | Website owners | The `<gh-like repo="owner/repo">` embeddable button |
 | **Extension** | [browser extension](extension/) | Visitors | One-click stars using their github.com session |
 | **CLI + daemon** | [`ghlike`](node/) (npm) | Developers | Star repos from the terminal; `ghlike daemon` powers widgets locally |
 
@@ -36,7 +36,7 @@ Star button is performed with your session — GitHub handles its own CSRF.
 ## 1. Widget — for your website
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ghlike-widget"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ghlike/widget"></script>
 
 <gh-like repo="vercel/next.js"></gh-like>
 <gh-like repo="vercel/next.js" variant="pill"></gh-like>
@@ -73,7 +73,7 @@ widget shows "Liked". Manifest V3, host permission only for
 ## 3. CLI + daemon — for developers
 
 ```bash
-npm install -g ghlike    # Node ≥ 22, zero dependencies
+npm install -g ghlike    # Node ≥ 22, zero deps — CLI + library + daemon + web widget
 ```
 
 ```bash
@@ -137,7 +137,7 @@ License: MIT.
 
 | Pieza | Paquete | Para quién | Qué hace |
 |-------|---------|------------|----------|
-| **Widget** | [`ghlike-widget`](widget/) (npm) | Dueños de webs | El botón embebible `<gh-like repo="owner/repo">` |
+| **Widget** | `ghlike/widget` (mismo paquete npm) | Dueños de webs | El botón embebible `<gh-like repo="owner/repo">` |
 | **Extensión** | [extensión de navegador](extension/) | Visitantes | Like con un clic usando su sesión de github.com |
 | **CLI + daemon** | [`ghlike`](node/) (npm) | Developers | Star desde el terminal; `ghlike daemon` alimenta widgets en local |
 
@@ -152,7 +152,7 @@ sobre el botón de Star real con tu sesión — GitHub gestiona su propio CSRF.
 ## 1. Widget — para tu web
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/ghlike-widget"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/ghlike/widget"></script>
 
 <gh-like repo="vercel/next.js"></gh-like>
 <gh-like repo="vercel/next.js" variant="pill"></gh-like>
@@ -187,7 +187,7 @@ storage, sin código remoto.
 ## 3. CLI + daemon — para developers
 
 ```bash
-npm install -g ghlike    # Node ≥ 22, cero dependencias
+npm install -g ghlike    # Node ≥ 22, cero deps — CLI + librería + daemon + widget web
 ```
 
 ```bash

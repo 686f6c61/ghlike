@@ -1,14 +1,17 @@
-# ghlike — CLI + library + daemon
+# ghlike — CLI + library + daemon + web widget
 
 **Star GitHub repos with your browser session — no tokens. / Da estrellas en
 GitHub con la sesión de tu navegador — sin tokens.**
+
+**One package, everything included:** terminal CLI, Node library, local
+daemon and the `<gh-like>` web button for any website.
 
 📦 npm: **[www.npmjs.com/package/ghlike](https://www.npmjs.com/package/ghlike)**
 
 [English](#english) · [Español](#español)
 
 Part of the [ghlike project](https://github.com/686f6c61/ghlike): the
-[`<gh-like>` widget](https://www.npmjs.com/package/ghlike-widget) for
+[`<gh-like>` widget](https://www.npmjs.com/package/ghlike) for
 websites + the [browser extension](https://github.com/686f6c61/ghlike/tree/main/extension)
 for visitors + this CLI. Python twin:
 [ghlike-py](https://github.com/686f6c61/ghlike-py) ([PyPI](https://pypi.org/project/ghlike/)).
@@ -77,10 +80,35 @@ await toggle("denoland/deno");
 
 Errors: `NoSessionError`, `RepoNotFoundError`, `GhlikeError`.
 
+## Web widget — `<gh-like>`
+
+The same package ships the like button for websites:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ghlike/widget"></script>
+
+<gh-like repo="vercel/next.js"></gh-like>
+<gh-like repo="vercel/next.js" variant="pill"></gh-like>
+```
+
+```js
+import "ghlike/widget";   // defines <gh-like>
+```
+
+- Live star count (GitHub public API; cached 1 h in `localStorage`).
+- Visitor with the **ghlike extension** → one click stars in place; with the
+  **daemon** running → same in any local browser; with **nothing** → opens
+  the repo in a new tab (never broken).
+- **5 variants**: `classic` (default), `pill`, `outline`, `glass`, `block`.
+- **Full CSS customization** via `--ghlike-*` custom properties
+  (`--ghlike-bg`, `--ghlike-fg`, `--ghlike-border`, `--ghlike-radius`,
+  `--ghlike-star`, …) and `::part(button|label|count)`.
+- The `repo` attribute is reactive and accepts full GitHub URLs.
+
 ## Daemon
 
 `ghlike daemon` serves `127.0.0.1:8469` so [`<gh-like>`
-buttons](https://www.npmjs.com/package/ghlike-widget) work with one click in
+buttons](https://www.npmjs.com/package/ghlike) work with one click in
 **any** browser on the machine — including embedded browsers that can't load
 extensions:
 
@@ -170,10 +198,37 @@ await toggle("denoland/deno");
 
 Errores: `NoSessionError`, `RepoNotFoundError`, `GhlikeError`.
 
+## Widget web — `<gh-like>`
+
+El mismo paquete incluye el botón de like para webs:
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/ghlike/widget"></script>
+
+<gh-like repo="vercel/next.js"></gh-like>
+<gh-like repo="vercel/next.js" variant="pill"></gh-like>
+```
+
+```js
+import "ghlike/widget";   // define <gh-like>
+```
+
+- Contador de stars en vivo (API pública de GitHub; cacheado 1 h en
+  `localStorage`).
+- Visitante con la **extensión ghlike** → un clic da el star en sitio; con el
+  **daemon** corriendo → igual en cualquier navegador local; con **nada** →
+  abre el repo en pestaña nueva (nunca roto).
+- **5 variantes**: `classic` (por defecto), `pill`, `outline`, `glass`,
+  `block`.
+- **Personalización CSS total** con variables `--ghlike-*`
+  (`--ghlike-bg`, `--ghlike-fg`, `--ghlike-border`, `--ghlike-radius`,
+  `--ghlike-star`, …) y `::part(button|label|count)`.
+- El atributo `repo` es reactivo y acepta URLs completas de GitHub.
+
 ## Daemon
 
 `ghlike daemon` sirve `127.0.0.1:8469` para que los botones
-[`<gh-like>`](https://www.npmjs.com/package/ghlike-widget) funcionen con un
+[`<gh-like>`](https://www.npmjs.com/package/ghlike) funcionen con un
 clic en **cualquier** navegador de la máquina — incluidos los embebidos que
 no pueden cargar extensiones:
 

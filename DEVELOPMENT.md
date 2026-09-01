@@ -32,8 +32,8 @@ CSRF). No tokens exist anywhere.
 ## File map
 
 ```
-widget/src/gh-like.js          web component: variants, CSS vars, count cache,
-                               extension/daemon/fallback click chain
+node/src/widget.js             web component <gh-like>: variants, CSS vars,
+                               count cache, click chain (ships as ghlike/widget)
 extension/manifest.json        MV3 manifest (host: github.com)
 extension/widget-bridge.js     content script (all sites): marks widgets,
                                intercepts clicks, talks to background
@@ -136,26 +136,25 @@ to test the extension), drive it over CDP, assert DOM state. Beware the
 
 ## Versioning & release runbook
 
-Versions to bump together in this repo (all currently `0.1.2`):
+Versions to bump together in this repo (all currently `0.1.3`):
 
 1. `node/package.json` → `version`
 2. `node/src/cli.mjs` → `VERSION`
-3. `widget/package.json` → `version`
-4. `extension/manifest.json` → `version`
-5. `node/src/daemon.mjs` → version in the `/ping` response
+3. `extension/manifest.json` → `version`
+4. `node/src/daemon.mjs` → version in the `/ping` response
 
 The Python package versions live in the
 [ghlike-py repo](https://github.com/686f6c61/ghlike-py).
 
 Publishing is automated: **push a git tag / create a GitHub Release named
 `vX.Y.Z`** and [`.github/workflows/publish-npm.yml`](.github/workflows/publish-npm.yml)
-publishes both npm packages (`ghlike-widget` and `ghlike`). It requires the
+publishes the `ghlike` npm package. It requires the
 `NPM_TOKEN` secret (npm automation token) in repo settings. The release tag
 must match the packages' `version`.
 
 ```bash
 # manual check before releasing
-cd widget && npm pack --dry-run && cd ../node && npm pack --dry-run
+cd node && npm pack --dry-run
 ```
 
 ## Security model
