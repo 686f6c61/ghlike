@@ -26,8 +26,8 @@ de tu página**.
 | **CLI + daemon** | [`ghlike`](node/) (npm) | Developers | Star repos from the terminal; `ghlike daemon` powers widgets locally |
 
 The Python twin of the CLI lives in a separate repo:
-[686f6c61/ghlike-py](https://github.com/686f6c61/ghlike-py) (`pipx install
-ghlike`).
+[686f6c61/ghlike-py](https://github.com/686f6c61/ghlike-py), available on
+[PyPI](https://pypi.org/project/ghlike/) (`pipx install ghlike`).
 
 The same principle powers everything: **your browser already has your GitHub
 login, so no tokens or OAuth flows are ever needed**. The click on the real
@@ -142,8 +142,8 @@ License: MIT.
 | **CLI + daemon** | [`ghlike`](node/) (npm) | Developers | Star desde el terminal; `ghlike daemon` alimenta widgets en local |
 
 El gemelo Python del CLI vive en otro repo:
-[686f6c61/ghlike-py](https://github.com/686f6c61/ghlike-py)
-(`pipx install ghlike`).
+[686f6c61/ghlike-py](https://github.com/686f6c61/ghlike-py), disponible en
+[PyPI](https://pypi.org/project/ghlike/) (`pipx install ghlike`).
 
 Las piezas se alimentan del mismo principio: **tu navegador ya tiene tu
 login de GitHub, así que nunca hacen falta tokens ni OAuth**. El clic se da
