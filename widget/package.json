@@ -1,0 +1,30 @@
+{
+  "name": "ghlike-widget",
+  "version": "0.1.0",
+  "description": "GitHub like-button for any website: <gh-like repo=\"owner/repo\">. One-click stars for visitors with the ghlike extension.",
+  "type": "module",
+  "main": "./src/gh-like.js",
+  "exports": {
+    ".": "./src/gh-like.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "github",
+    "star",
+    "like",
+    "web-component",
+    "custom-element",
+    "widget",
+    "button"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/686f6c61/ghlike.git",
+    "directory": "widget"
+  }
+}

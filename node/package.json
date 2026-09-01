@@ -1,0 +1,33 @@
+{
+  "name": "ghlike",
+  "version": "0.1.0",
+  "description": "Like (star) repos on GitHub with your existing browser session — no tokens, no API keys.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "star",
+    "like",
+    "cli",
+    "browser-session",
+    "cdp"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "ghlike": "./src/cli.mjs"
+  },
+  "main": "./src/index.mjs",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/686f6c61/ghlike.git",
+    "directory": "node"
+  },
+  "preferGlobal": false
+}
