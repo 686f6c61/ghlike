@@ -53,16 +53,20 @@ async function waitReady(tab, timeoutMs = 25000) {
   throw new GhlikeError('la pagina no termino de cargar');
 }
 
-async function readState(tab) {
-  const deadline = Date.now() + 10000;
+async function readState(tab, timeoutMs = 20000) {
+  // Espera al login Y al botón: en repos grandes el header de React puede
+  // hidratarse después del meta de login, y comprobar antes da un falso
+  // "markup cambió".
+  const deadline = Date.now() + timeoutMs;
+  let st = {};
   while (Date.now() < deadline) {
     try {
-      const st = await tab.eval(STATE_JS);
-      if (st && st.login !== null && st.login !== undefined) return st;
+      st = (await tab.eval(STATE_JS)) || {};
+      if (st.login && (st.found || st.notFound)) return st;
     } catch {}
     await new Promise(r => setTimeout(r, 500));
   }
-  return (await tab.eval(STATE_JS).catch(() => ({}))) || {};
+  return st;
 }
 
 async function killTree(proc) {

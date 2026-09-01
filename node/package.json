@@ -1,6 +1,6 @@
 {
   "name": "ghlike",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Like (star) repos on GitHub with your existing browser session — no tokens, no API keys.",
   "type": "module",
   "license": "MIT",
