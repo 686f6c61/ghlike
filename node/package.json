@@ -28,6 +28,5 @@
     "type": "git",
     "url": "git+https://github.com/686f6c61/ghlike.git",
     "directory": "node"
-  },
-  "preferGlobal": false
+  }
 }
