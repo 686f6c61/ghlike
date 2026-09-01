@@ -136,12 +136,13 @@ to test the extension), drive it over CDP, assert DOM state. Beware the
 
 ## Versioning & release runbook
 
-Versions to bump together in this repo (all currently `0.1.0`):
+Versions to bump together in this repo (all currently `0.1.2`):
 
 1. `node/package.json` → `version`
 2. `node/src/cli.mjs` → `VERSION`
 3. `widget/package.json` → `version`
 4. `extension/manifest.json` → `version`
+5. `node/src/daemon.mjs` → version in the `/ping` response
 
 The Python package versions live in the
 [ghlike-py repo](https://github.com/686f6c61/ghlike-py).

@@ -1,6 +1,6 @@
 {
   "name": "ghlike-widget",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "GitHub like-button for any website: <gh-like repo=\"owner/repo\">. One-click stars for visitors with the ghlike extension.",
   "type": "module",
   "main": "./src/gh-like.js",

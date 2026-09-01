@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ghlike — one-click GitHub stars",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Star GitHub repos with one click from any website, using your existing github.com login. No tokens.",
   "browser_specific_settings": {
     "gecko": { "id": "ghlike@ghlike.dev" }
