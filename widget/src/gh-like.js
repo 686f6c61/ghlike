@@ -199,8 +199,17 @@
       // red lenta, bloqueo momentaneo del navegador): re-sondear ANTES de
       // abrir pestañas. Solo si sigue sin haber daemon se cae al fallback.
       this._probeDaemon(true).then((ok) => {
-        if (ok) this._daemonToggle();
-        else if (this.repo)
+        if (ok) return this._daemonToggle();
+        if (!this.repo) return;
+        // Evento cancelable antes del fallback: la pagina puede impedir la
+        // pestaña nueva (preventDefault) y encargarse ella — p.ej. abrir un
+        // modal explicando como activar el like de un clic.
+        const ev = new CustomEvent("ghlike:fallback", {
+          bubbles: true, composed: true, cancelable: true,
+          detail: { repo: this.repo },
+        });
+        const notPrevented = this.dispatchEvent(ev);
+        if (notPrevented)
           window.open(`https://github.com/${this.repo}`, "_blank", "noopener");
       });
     }

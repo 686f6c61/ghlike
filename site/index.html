@@ -300,6 +300,47 @@
   html[data-theme="dark"] .daemon-banner:not(.on):not(.checking){background:#2b2312; border-color:#5a4a1e; color:#eccf8a}
   html[data-theme="dark"] .daemon-banner:not(.on):not(.checking) code{background:rgba(255,255,255,.06); border-color:#5a4a1e; color:#eccf8a}
 
+  /* ---------- modal «activa el like con un clic» ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:100; display:none;
+    background:rgba(0,0,0,.52); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .overlay.open{display:flex}
+  .modal{
+    background:var(--surface); border:1px solid var(--border); border-radius:20px;
+    max-width:560px; width:100%; padding:26px 26px 20px; position:relative;
+    box-shadow:var(--shadow); max-height:90vh; overflow-y:auto;
+  }
+  .modal h4{margin:0 0 4px; font-size:19px; display:flex; align-items:center; gap:10px}
+  .modal h4 svg{width:20px; height:20px; color:var(--star)}
+  .modal .repo-chip{
+    display:inline-block; font-family:ui-monospace,Consolas,monospace; font-size:12.5px;
+    background:var(--bg-soft); border:1px solid var(--border); border-radius:999px;
+    padding:2px 10px; margin-bottom:14px;
+  }
+  .modal .close{
+    position:absolute; top:14px; right:14px; width:34px; height:34px; border-radius:50%;
+    border:0; background:transparent; color:var(--text-2); cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .modal .close:hover{background:var(--bg-soft); color:var(--text)}
+  .modal .close svg{width:19px; height:19px}
+  .opt{
+    display:flex; gap:12px; border:1px solid var(--border); border-radius:14px;
+    padding:14px; margin:10px 0; align-items:flex-start;
+  }
+  .opt svg{width:21px; height:21px; color:var(--primary); flex:none; margin-top:2px}
+  .opt .t{font-weight:600; font-size:14.5px}
+  .opt p{margin:2px 0 0; font-size:13.5px; color:var(--text-2); max-width:none}
+  .opt .code{margin:8px 0 0; max-width:none}
+  .opt .code pre{padding:9px 12px}
+  .opt .code code{font-size:12.5px}
+  .modal .manual{
+    margin-top:14px; padding-top:12px; border-top:1px solid var(--border);
+    font-size:13.5px; color:var(--text-2); text-align:center;
+  }
+
   /* ---------- playground ---------- */
   .playground{
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
@@ -596,8 +637,8 @@
         <span class="es">Sin nada instalado</span><span class="en">Nothing installed</span>
       </h4>
       <p>
-        <span class="es">El clic abre el repo en una pestaña nueva (fallback clásico) y muestra una pista discreta.</span>
-        <span class="en">The click opens the repo in a new tab (classic fallback) and shows a small hint.</span>
+        <span class="es">El clic explica aquí mismo cómo activar el like con un clic — y deja el enlace para dar la star a mano, solo si lo pides.</span>
+        <span class="en">The click explains right here how to enable one-click likes — with the manual star link only if you ask for it.</span>
       </p>
     </div>
   </div>
@@ -1075,6 +1116,61 @@ brave --load-extension=$PWD/extension http://127.0.0.1:8123/site/</code></pre>
   </div>
 </footer>
 
+<!-- ================= MODAL: activar el like con un clic =================
+     Se abre cuando un visitante SIN extension ni daemon pulsa un boton:
+     en esta landing nunca le abrimos el repo en una pestaña nueva por sorpresa. -->
+<div class="overlay" id="fb-overlay" role="dialog" aria-modal="true" aria-labelledby="fb-title">
+  <div class="modal">
+    <button class="close" id="fb-close" type="button" aria-label="Cerrar · Close">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+    <h4 id="fb-title">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+      <span class="es">El like con un clic necesita un paso más</span>
+      <span class="en">One-click like needs one more step</span>
+    </h4>
+    <span class="repo-chip" id="fb-repo"></span>
+
+    <div class="opt">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.7 2.7 0 010 5.4H2V20a2 2 0 002 2h3.8v-1.5a2.7 2.7 0 015.4 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 000-5z"/></svg>
+      <div style="flex:1">
+        <div class="t"><span class="es">La extensión — para quien visita webs</span><span class="en">The extension — for web visitors</span></div>
+        <p>
+          <span class="es">Instálala una vez en tu navegador y todo botón <code>&lt;gh-like&gt;</code> de cualquier web dará like con un clic, sin salir de la página.</span>
+          <span class="en">Install it once in your browser and every <code>&lt;gh-like&gt;</code> button on the web likes with one click, without leaving the page.</span>
+        </p>
+        <button class="btn tonal small" id="fb-goto-ext" type="button" style="margin-top:10px">
+          <span class="es">Cómo instalarla (2 min)</span>
+          <span class="en">How to install it (2 min)</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="opt">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm2 4v2h10V7H5zm0 4v2h7v-2H5z"/></svg>
+      <div style="flex:1">
+        <div class="t"><span class="es">El CLI + daemon — para developers</span><span class="en">The CLI + daemon — for developers</span></div>
+        <p>
+          <span class="es">Instala el paquete, deja el daemon corriendo y recarga esta página: los botones pasan a dar like con un clic en tu máquina.</span>
+          <span class="en">Install the package, keep the daemon running and reload this page: the buttons become one-click on your machine.</span>
+        </p>
+        <div class="code">
+          <div class="codebar"><span class="lang">bash</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
+          <pre><code>npm install -g ghlike && ghlike daemon</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="manual">
+      <span class="es">¿Sin instalar nada? </span><span class="en">No installs? </span>
+      <a id="fb-manual" href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">
+        <span class="es">dale la star a mano en GitHub</span>
+        <span class="en">star it manually on GitHub</span> →
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- ================= WIDGET (local, con fallback CDN) ================= -->
 <script type="module" src="../widget/src/gh-like.js"></script>
 <script>
@@ -1186,6 +1282,29 @@ brave --load-extension=$PWD/extension http://127.0.0.1:8123/site/</code></pre>
   document.getElementById("pg-set").addEventListener("click", point);
   pgRepo.addEventListener("keydown", (e) => { if (e.key === "Enter") point(); });
   renderPg();
+
+  /* ---------- modal «like con un clic» ----------
+     El widget emite ghlike:fallback (cancelable) justo antes de abrir el
+     repo en una pestaña nueva. Aquí lo cancelamos y explicamos las dos
+     vías (extensión / CLI+daemon) sin sacar al visitante de la página. */
+  const fbOverlay = document.getElementById("fb-overlay");
+  const fbRepo = document.getElementById("fb-repo");
+  const fbManual = document.getElementById("fb-manual");
+  document.addEventListener("ghlike:fallback", (ev) => {
+    ev.preventDefault();
+    fbRepo.textContent = ev.detail.repo || "";
+    if (ev.detail.repo) fbManual.href = `https://github.com/${ev.detail.repo}`;
+    fbOverlay.classList.add("open");
+    document.getElementById("fb-close").focus();
+  });
+  function fbClose() { fbOverlay.classList.remove("open"); }
+  document.getElementById("fb-close").addEventListener("click", fbClose);
+  fbOverlay.addEventListener("click", (e) => { if (e.target === fbOverlay) fbClose(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") fbClose(); });
+  document.getElementById("fb-goto-ext").addEventListener("click", () => {
+    fbClose();
+    document.getElementById("extension").scrollIntoView({ behavior: "smooth" });
+  });
 
   /* ---------- indicador en vivo del daemon · live daemon status ----------
      Sondea /ping en 127.0.0.1:8469 (mismo endpoint que el widget). Rápido
