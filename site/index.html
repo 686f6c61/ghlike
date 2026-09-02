@@ -1171,8 +1171,9 @@ brave --load-extension=$PWD/extension http://127.0.0.1:8123/site/</code></pre>
   </div>
 </div>
 
-<!-- ================= WIDGET (local, con fallback CDN) ================= -->
-<script type="module" src="../widget/src/gh-like.js"></script>
+<!-- ================= WIDGET (local, con fallback CDN) =================
+     ?v=N rompe la caché cuando cambia el widget: súbelo al modificarlo. -->
+<script type="module" src="../widget/src/gh-like.js?v=1"></script>
 <script>
 (() => {
   "use strict";
