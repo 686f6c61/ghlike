@@ -194,31 +194,46 @@
       // 1) extension presente: su bridge intercepta en captura y esto no corre.
       if (this.hasAttribute("data-ghlike-ext")) return;
       // 2) daemon local presente: star en sitio con la sesion del navegador.
-      if (this._daemon) return this._daemonToggle();
-      // 3) nada instalado: fallback clasico (abrir el repo).
-      if (this.repo) window.open(`https://github.com/${this.repo}`, "_blank", "noopener");
+      if (this._daemon === true) return this._daemonToggle();
+      // La sonda inicial pudo fallar (daemon arrancado despues de la carga,
+      // red lenta, bloqueo momentaneo del navegador): re-sondear ANTES de
+      // abrir pestañas. Solo si sigue sin haber daemon se cae al fallback.
+      this._probeDaemon(true).then((ok) => {
+        if (ok) this._daemonToggle();
+        else if (this.repo)
+          window.open(`https://github.com/${this.repo}`, "_blank", "noopener");
+      });
     }
 
-    async _probeDaemon() {
-      if (this._daemon !== null || !this.repo) return;
-      this._daemon = false;
-      const base = this.getAttribute("daemon-url") || "http://127.0.0.1:8469";
-      try {
-        const ctl = new AbortController();
-        const t = setTimeout(() => ctl.abort(), 1200);
-        const res = await fetch(`${base}/ping`, { signal: ctl.signal });
-        clearTimeout(t);
-        if (res.ok) {
-          const info = await res.json();
-          if (info && info.service === "ghlike-daemon") {
-            this._daemon = true;
-            this.classList.add("ghlike-live");
-            this._render(); // oculta la pista de la extension
+    _probeDaemon(force = false) {
+      if (this._daemon === true) return Promise.resolve(true);
+      if (!force && this._daemon !== null) return Promise.resolve(this._daemon);
+      if (!this.repo) return Promise.resolve(false);
+      if (this._probing) return this._probing;
+      this._probing = (async () => {
+        const base = this.getAttribute("daemon-url") || "http://127.0.0.1:8469";
+        try {
+          const ctl = new AbortController();
+          const t = setTimeout(() => ctl.abort(), 1200);
+          const res = await fetch(`${base}/ping`, { signal: ctl.signal });
+          clearTimeout(t);
+          if (res.ok) {
+            const info = await res.json();
+            if (info && info.service === "ghlike-daemon") {
+              this._daemon = true;
+              this.classList.add("ghlike-live");
+              this._render(); // oculta la pista de la extension
+              return true;
+            }
           }
+        } catch (e) {
+          /* sin daemon: queda el fallback */
         }
-      } catch (e) {
-        /* sin daemon: queda el fallback */
-      }
+        this._daemon = false;
+        return false;
+      })();
+      this._probing.finally(() => { this._probing = null; });
+      return this._probing;
     }
 
     async _daemonToggle() {
