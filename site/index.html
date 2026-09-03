@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ghlike — el botón de like para GitHub, sin tokens</title>
-<meta name="description" content="ghlike: el botón de «me gusta» para repos de GitHub. Widget para tu web + CLI (PyPI/npm). Sin tokens, sin OAuth. · The GitHub like-button: web widget + CLI. No tokens, no OAuth.">
-<meta name="keywords" content="github, star, like, like button, widget, web component, cli, pypi, npm, ghlike">
+<title>ghlike — stars de GitHub desde el terminal, sin tokens</title>
+<meta name="description" content="ghlike: da y quita stars en GitHub desde el terminal usando la sesión de tu navegador. CLI para Python (PyPI) y Node (npm), cero dependencias. · Star/unstar GitHub repos from the terminal with your browser session. No tokens, no OAuth.">
+<meta name="keywords" content="github, star, like, cli, terminal, pypi, npm, python, node, ghlike">
 <meta name="robots" content="index,follow">
 <meta name="author" content="ghlike contributors">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
@@ -16,24 +16,24 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ghlike">
 <meta property="og:url" content="https://ghlike.686f6c61.dev/">
-<meta property="og:title" content="ghlike — el botón de like para GitHub, sin tokens">
-<meta property="og:description" content="Quien visita tu web y ya está logueado en GitHub le da star a tu repo sin salir de tu página. Widget + CLI (npm/PyPI). · The GitHub like button for your site — widget + CLI. No tokens, no OAuth.">
+<meta property="og:title" content="ghlike — stars de GitHub desde el terminal, sin tokens">
+<meta property="og:description" content="Da y quita stars en GitHub desde el terminal con la sesión de tu navegador. CLI para Python y Node, cero dependencias. · GitHub stars from your terminal using your browser session — CLI for Python and Node.">
 <meta property="og:image" content="https://ghlike.686f6c61.dev/og-image.png">
 <meta property="og:image:secure_url" content="https://ghlike.686f6c61.dev/og-image.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="ghlike — el botón de like para GitHub: estrella dorada, botón Liked y badges npm · PyPI · MIT">
+<meta property="og:image:alt" content="ghlike — stars de GitHub desde el terminal: estrella dorada, terminal y badges npm · PyPI · MIT">
 <meta property="og:locale" content="es_ES">
 <meta property="og:locale:alternate" content="en_US">
 
 <!-- Twitter/X Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@ghlike">
-<meta name="twitter:title" content="ghlike — el botón de like para GitHub, sin tokens">
-<meta name="twitter:description" content="Widget + CLI: stars de GitHub sin tokens ni OAuth, con la sesión de tu navegador. · GitHub likes, everywhere.">
+<meta name="twitter:title" content="ghlike — stars de GitHub desde el terminal, sin tokens">
+<meta name="twitter:description" content="CLI para Python y Node: stars de GitHub desde el terminal con la sesión de tu navegador. Sin tokens, sin OAuth. · GitHub stars from the terminal with your browser session.">
 <meta name="twitter:image" content="https://ghlike.686f6c61.dev/og-image.png">
-<meta name="twitter:image:alt" content="ghlike — el botón de like para GitHub">
+<meta name="twitter:image:alt" content="ghlike — stars de GitHub desde el terminal">
 
 <!-- Datos estructurados · structured data -->
 <script type="application/ld+json">
@@ -45,7 +45,7 @@
       "name": "ghlike",
       "url": "https://ghlike.686f6c61.dev/",
       "inLanguage": ["es", "en"],
-      "description": "El botón de «me gusta» para repos de GitHub: widget para tu web y CLI, sin tokens ni OAuth. The GitHub like-button: web widget and CLI, no tokens.",
+      "description": "Stars de GitHub desde el terminal con la sesión de tu navegador, sin tokens ni OAuth. GitHub stars from the terminal with your browser session, no tokens.",
       "license": "https://opensource.org/licenses/MIT"
     },
     {
@@ -54,10 +54,9 @@
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Linux",
       "url": "https://github.com/686f6c61/ghlike",
-      "description": "Like (star) repos de GitHub con la sesión del navegador — widget <gh-like> para webs y CLI en Python y Node, cero dependencias.",
-      "featureList": "Widget web con contador de stars, CLI para dar likes desde el terminal, daemon local para clics en la web, extensión de navegador",
+      "description": "CLI para dar y quitar likes (stars) en repos de GitHub desde el terminal usando la sesión del navegador — paquetes gemelos en Python (PyPI) y Node (npm), cero dependencias.",
+      "featureList": "Star, unstar, check, toggle y listado de sesiones desde el terminal; salida JSON; uso como librería en Python y Node",
       "programmingLanguage": ["Python", "JavaScript"],
-      "softwareVersion": "0.1.3",
       "license": "https://opensource.org/licenses/MIT",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
@@ -69,7 +68,7 @@
 <style>
   /* ============================================================
      ghlike — sitio de presentación (estilo osv.dev / Material)
-     Un solo fichero, cero dependencias: CSS, JS e íconos inline.
+     HTML + CSS inline y un app.js externo, cero dependencias.
      ============================================================ */
   :root{
     --bg:#ffffff; --bg-soft:#f7f8fa;
@@ -156,7 +155,13 @@
     font-size:clamp(30px, 5.2vw, 46px); line-height:1.15; font-weight:700; letter-spacing:-.5px; margin:0 0 18px;
   }
   .hero p.sub{font-size:clamp(16px, 2vw, 19px); color:var(--text-2); max-width:680px; margin:0 auto 30px}
-  .hero .actions{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:26px}
+  .hero .actions{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:18px}
+  .hero .stars-line{
+    display:inline-flex; align-items:center; gap:7px; margin:0 0 26px;
+    color:var(--text-2); font-size:14.5px; font-weight:500;
+  }
+  .hero .stars-line svg{width:16px; height:16px; color:var(--star)}
+  .hero .stars-line:hover{text-decoration:none; color:var(--primary)}
   .btn{
     display:inline-flex; align-items:center; gap:8px; border-radius:999px; cursor:pointer;
     padding:13px 26px; font-size:15.5px; font-weight:600; text-decoration:none; border:1px solid transparent;
@@ -200,8 +205,7 @@
   /* ---------- tarjetas ---------- */
   .grid{display:grid; gap:16px; margin:22px 0}
   .grid.c2{grid-template-columns:repeat(auto-fit, minmax(300px, 1fr))}
-  .grid.c3{grid-template-columns:repeat(auto-fit, minmax(240px, 1fr))}
-  .grid.c5{grid-template-columns:repeat(auto-fit, minmax(200px, 1fr))}
+  .grid.c4{grid-template-columns:repeat(auto-fit, minmax(220px, 1fr))}
   .card{
     background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
     padding:22px; display:flex; flex-direction:column; gap:10px; align-items:flex-start;
@@ -214,16 +218,8 @@
     font-size:11.5px; font-weight:600; letter-spacing:.4px; padding:3px 9px; border-radius:999px;
     background:var(--primary-container); color:var(--on-primary-container);
   }
-  .card .demo-zone{margin-top:6px; padding-top:14px; border-top:1px dashed var(--border); width:100%}
   .icard svg{width:22px; height:22px; color:var(--primary)}
   .icard h4{display:flex; align-items:center; gap:9px}
-
-  /* tarjeta degradada para la variante glass */
-  .card.gradient{
-    background:linear-gradient(135deg,#0d4dbb,#7b2ff7); border:0; color:#fff;
-  }
-  .card.gradient p{color:rgba(255,255,255,.85)}
-  .card.gradient code.name{color:#fff}
 
   /* ---------- bloques de código ---------- */
   .code{
@@ -276,93 +272,6 @@
   .note p{margin:0; max-width:none}
   .note strong{color:var(--text)}
 
-  /* ---------- indicador del daemon ---------- */
-  .daemon-banner{
-    display:flex; gap:12px; align-items:flex-start;
-    border:1px solid; border-radius:12px; padding:14px 16px; margin:18px 0 26px;
-    font-size:14.5px; max-width:860px;
-  }
-  .daemon-banner .dot{flex:none; width:10px; height:10px; border-radius:50%; margin-top:7px}
-  .daemon-banner.checking{background:var(--bg-soft); border-color:var(--border-strong); color:var(--text-2)}
-  .daemon-banner.checking .dot{background:var(--text-2); animation:ghlike-pulse 1.2s infinite}
-  .daemon-banner.on{background:#e6f4ea; border-color:#a8dab5; color:#0f5132}
-  .daemon-banner.on .dot{background:#188038}
-  .daemon-banner.on code{background:rgba(255,255,255,.55); border-color:#a8dab5; color:#0f5132}
-  .daemon-banner:not(.on):not(.checking){background:#fef7e0; border-color:#f0dfa4; color:#5c4600}
-  .daemon-banner:not(.on):not(.checking) .dot{background:#b06000; animation:ghlike-pulse 2s infinite}
-  .daemon-banner.on .off-only,
-  .daemon-banner:not(.on) .on-only,
-  .daemon-banner:not(.checking) .check-only,
-  .daemon-banner.checking .state-only{display:none}
-  @keyframes ghlike-pulse{50%{opacity:.35}}
-  html[data-theme="dark"] .daemon-banner.on{background:#0e2417; border-color:#2b5c3c; color:#8bdfa4}
-  html[data-theme="dark"] .daemon-banner.on code{background:rgba(255,255,255,.08); border-color:#2b5c3c; color:#8bdfa4}
-  html[data-theme="dark"] .daemon-banner:not(.on):not(.checking){background:#2b2312; border-color:#5a4a1e; color:#eccf8a}
-  html[data-theme="dark"] .daemon-banner:not(.on):not(.checking) code{background:rgba(255,255,255,.06); border-color:#5a4a1e; color:#eccf8a}
-
-  /* ---------- modal «activa el like con un clic» ---------- */
-  .overlay{
-    position:fixed; inset:0; z-index:100; display:none;
-    background:rgba(0,0,0,.52); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
-    align-items:center; justify-content:center; padding:20px;
-  }
-  .overlay.open{display:flex}
-  .modal{
-    background:var(--surface); border:1px solid var(--border); border-radius:20px;
-    max-width:560px; width:100%; padding:26px 26px 20px; position:relative;
-    box-shadow:var(--shadow); max-height:90vh; overflow-y:auto;
-  }
-  .modal h4{margin:0 0 4px; font-size:19px; display:flex; align-items:center; gap:10px}
-  .modal h4 svg{width:20px; height:20px; color:var(--star)}
-  .modal .repo-chip{
-    display:inline-block; font-family:ui-monospace,Consolas,monospace; font-size:12.5px;
-    background:var(--bg-soft); border:1px solid var(--border); border-radius:999px;
-    padding:2px 10px; margin-bottom:14px;
-  }
-  .modal .close{
-    position:absolute; top:14px; right:14px; width:34px; height:34px; border-radius:50%;
-    border:0; background:transparent; color:var(--text-2); cursor:pointer;
-    display:inline-flex; align-items:center; justify-content:center;
-  }
-  .modal .close:hover{background:var(--bg-soft); color:var(--text)}
-  .modal .close svg{width:19px; height:19px}
-  .opt{
-    display:flex; gap:12px; border:1px solid var(--border); border-radius:14px;
-    padding:14px; margin:10px 0; align-items:flex-start;
-  }
-  .opt svg{width:21px; height:21px; color:var(--primary); flex:none; margin-top:2px}
-  .opt .t{font-weight:600; font-size:14.5px}
-  .opt p{margin:2px 0 0; font-size:13.5px; color:var(--text-2); max-width:none}
-  .opt .code{margin:8px 0 0; max-width:none}
-  .opt .code pre{padding:9px 12px}
-  .opt .code code{font-size:12.5px}
-  .modal .manual{
-    margin-top:14px; padding-top:12px; border-top:1px solid var(--border);
-    font-size:13.5px; color:var(--text-2); text-align:center;
-  }
-
-  /* ---------- playground ---------- */
-  .playground{
-    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-    padding:24px; margin:22px 0; max-width:860px;
-  }
-  .playground .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:14px 0}
-  .vchip{
-    border:1px solid var(--border-strong); background:var(--surface); color:var(--text-2);
-    border-radius:999px; padding:6px 14px; font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit;
-  }
-  .vchip:hover{border-color:var(--primary); color:var(--primary)}
-  .vchip.on{background:var(--primary); border-color:var(--primary); color:var(--on-primary)}
-  .playground input{
-    flex:1; min-width:220px; padding:9px 13px; border-radius:10px; font:inherit; font-size:14px;
-    border:1px solid var(--border-strong); background:var(--bg); color:var(--text);
-  }
-  .btn.small{padding:9px 18px; font-size:14px}
-  .preview{
-    border:1px dashed var(--border-strong); border-radius:12px; padding:22px; margin-top:8px;
-    display:flex; justify-content:center; background:var(--bg-soft);
-  }
-
   /* ---------- listas ---------- */
   ul.feats{max-width:780px; padding-left:22px; margin:14px 0}
   ul.feats li{margin:8px 0}
@@ -378,40 +287,6 @@
     flex-wrap:wrap; align-items:center; justify-content:space-between; color:var(--text-2); font-size:14px;
   }
   .foot .links{display:flex; gap:20px; flex-wrap:wrap}
-
-  /* ---------- widget: coherencia con el tema de la página ----------
-     El widget sigue prefers-color-scheme para sus valores por defecto
-     ("classic"), pero los estilos de la página SIEMPRE ganan a los del
-     :host interno. Esta es la técnica documentada para sincronizar el
-     botón con el tema de tu web (se explica en la sección «Botones»). */
-  html[data-theme="light"] gh-like,
-  html[data-theme="light"] gh-like[variant="classic"]{
-    --ghlike-bg:#f6f8fa; --ghlike-bg-hover:#eef1f4; --ghlike-fg:#24292f;
-    --ghlike-border:#d0d7de; --ghlike-star:#9a6700;
-  }
-  html[data-theme="dark"] gh-like,
-  html[data-theme="dark"] gh-like[variant="classic"]{
-    --ghlike-bg:#26282d; --ghlike-bg-hover:#2d3239; --ghlike-fg:#e6edf3;
-    --ghlike-border:#42474e; --ghlike-star:#d29922;
-  }
-  html[data-theme="dark"] gh-like[variant="outline"]{
-    --ghlike-fg:#8ab4f8; --ghlike-border:#8ab4f8; --ghlike-star:#8ab4f8;
-    --ghlike-bg-hover:rgba(138,180,248,.14);
-    --ghlike-on-bg:#8ab4f8; --ghlike-on-border:#8ab4f8; --ghlike-on-fg:#0b2545;
-  }
-  html[data-theme="dark"] gh-like[variant="pill"]{
-    --ghlike-bg:#2a2f37; --ghlike-bg-hover:#333944; --ghlike-border:#2a2f37; --ghlike-fg:#f0f3f6;
-  }
-  /* ejemplos de la documentación */
-  gh-like.pink{
-    --ghlike-bg:#fff0f6; --ghlike-border:#ff2d87; --ghlike-fg:#c2185b;
-    --ghlike-star:#ff2d87; --ghlike-radius:4px; --ghlike-padding:8px 16px;
-  }
-  html[data-theme="dark"] gh-like.pink{
-    --ghlike-bg:#3a1029; --ghlike-border:#ff2d87; --ghlike-fg:#ffb3d1;
-    --ghlike-star:#ff2d87;
-  }
-  gh-like.fancy::part(button){font-weight:700; letter-spacing:.4px}
 
   @media (max-width:860px){
     nav.main{display:none}
@@ -430,11 +305,10 @@
       ghlike
     </a>
     <nav class="main" aria-label="sección / section">
-      <a href="#demo"><span class="es">Demo</span><span class="en">Demo</span></a>
-      <a href="#widget"><span class="es">Widget</span><span class="en">Widget</span></a>
-      <a href="#customize"><span class="es">Botones</span><span class="en">Buttons</span></a>
-      <a href="#cli">CLI</a>
-      <a href="#extension"><span class="es">Extensión</span><span class="en">Extension</span></a>
+      <a href="#usage"><span class="es">Uso</span><span class="en">Usage</span></a>
+      <a href="#library"><span class="es">Librería</span><span class="en">Library</span></a>
+      <a href="#how"><span class="es">Cómo funciona</span><span class="en">How it works</span></a>
+      <a href="#security"><span class="es">Seguridad</span><span class="en">Security</span></a>
     </nav>
     <div class="topbtns">
       <div class="langswitch" role="group" aria-label="idioma / language">
@@ -454,508 +328,155 @@
 <!-- ================= HÉROE ================= -->
 <div class="hero">
   <h1>
-    <span class="es">El botón de «me gusta»<br>para repos de GitHub</span>
-    <span class="en">The “like” button<br>for GitHub repositories</span>
+    <span class="es">Stars de GitHub<br>desde el terminal</span>
+    <span class="en">GitHub stars<br>from your terminal</span>
   </h1>
   <p class="sub">
-    <span class="es">Quien visita tu web y ya está logueado en GitHub le da <strong>star a tu repo sin salir de tu página</strong>. Sin tokens, sin OAuth, sin fricción: el navegador ya tiene la sesión.</span>
-    <span class="en">Visitors to your site who are already logged into GitHub can <strong>star your repo without leaving the page</strong>. No tokens, no OAuth, no friction: the browser already holds the session.</span>
+    <span class="es">Likes (stars) en GitHub desde el terminal con la sesión de tu navegador. Sin tokens, sin OAuth, sin <code>gh auth</code>. <strong>Cero dependencias</strong> — Python&nbsp;≥&nbsp;3.9 y Node&nbsp;≥&nbsp;22.</span>
+    <span class="en">Likes (stars) on GitHub from the terminal using your browser session. No tokens, no OAuth, no <code>gh auth</code>. <strong>Zero dependencies</strong> — Python&nbsp;≥&nbsp;3.9 and Node&nbsp;≥&nbsp;22.</span>
   </p>
   <div class="actions">
-    <a class="btn filled" href="#widget">
+    <a class="btn filled" href="#install">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2l-1.5 6.5H17l-7 13 1.5-7.5H6L13 2z"/></svg>
-      <span class="es">Poner el botón en mi web</span>
-      <span class="en">Add the button to my site</span>
+      <span class="es">Instalar el CLI</span>
+      <span class="en">Install the CLI</span>
     </a>
-    <a class="btn tonal" href="#cli">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm2 3v2h10V7H5zm0 4v2h7v-2H5z"/></svg>
-      <span class="es">Probar el CLI</span>
-      <span class="en">Try the CLI</span>
+    <a class="btn tonal" href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span class="es">Ver en GitHub</span>
+      <span class="en">View on GitHub</span>
     </a>
   </div>
+  <a class="stars-line" id="gh-stars-link" href="https://github.com/686f6c61/ghlike/stargazers" target="_blank" rel="noopener">
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+    <span><strong id="gh-stars">·</strong> stars — 686f6c61/ghlike</span>
+  </a>
   <div class="chips" id="chips">
-    <a class="chip" href="#demo" data-target="demo">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-      <span class="es">Demo en vivo</span><span class="en">Live demo</span>
+    <a class="chip" href="#install" data-target="install">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2l-1.5 6.5H17l-7 13 1.5-7.5H6L13 2z"/></svg>
+      <span class="es">Instalación</span><span class="en">Install</span>
     </a>
-    <a class="chip" href="#customize" data-target="customize">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-      <span class="es">Cambiar los botones</span><span class="en">Customize buttons</span>
-    </a>
-    <a class="chip" href="#cli" data-target="cli">
+    <a class="chip" href="#usage" data-target="usage">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm2 4v10h14V8H5zm1 2l3 3-3 3 1.4 1.4L11.8 13 7.4 8.6 6 10zm5 6v2h6v-2h-6z"/></svg>
-      <span class="es">Instalar el CLI</span><span class="en">Install the CLI</span>
+      <span class="es">Uso del CLI</span><span class="en">CLI usage</span>
     </a>
-    <a class="chip" href="#extension" data-target="extension">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.5 2a2.5 2.5 0 010 5H10v2h4a2 2 0 012 2v1h.5a2.5 2.5 0 010 5H16v1a2 2 0 01-2 2H6a2 2 0 01-2-2v-9a2 2 0 012-2h2V6.5A2.5 2.5 0 0110.5 2z" transform="translate(2 0)"/></svg>
-      <span class="es">La extensión</span><span class="en">The extension</span>
+    <a class="chip" href="#library" data-target="library">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+      <span class="es">Como librería</span><span class="en">As a library</span>
+    </a>
+    <a class="chip" href="#how" data-target="how">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      <span class="es">Cómo funciona</span><span class="en">How it works</span>
+    </a>
+    <a class="chip" href="#security" data-target="security">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+      <span class="es">Seguridad</span><span class="en">Security</span>
     </a>
   </div>
 </div>
 
 <div class="wrap">
 
-<!-- ================= DEMO: LIKE A LOS DOS PAQUETES ================= -->
-<section class="section" id="demo">
-  <span class="kicker">demo</span>
+<!-- ================= INSTALACIÓN ================= -->
+<section class="section steps" id="install">
+  <span class="kicker"><span class="es">instalación</span><span class="en">install</span></span>
   <h2>
-    <span class="es">Dale like a los dos paquetes</span>
-    <span class="en">Like the two packages</span>
+    <span class="es">Dos paquetes gemelos — elige tu ecosistema</span>
+    <span class="en">Two twin packages — pick your ecosystem</span>
   </h2>
   <p class="lead">
-    <span class="es">Los dos paquetes de ghlike viven en el mismo repositorio, así que una sola star los cubre. Estos botones son widgets reales <code>&lt;gh-like&gt;</code> apuntando a <code>686f6c61/ghlike</code>: pruébalos ahora mismo.</span>
-    <span class="en">Both ghlike packages live in the same repository, so one star covers them both. The buttons below are real <code>&lt;gh-like&gt;</code> widgets pointing at <code>686f6c61/ghlike</code> — try them right now.</span>
+    <span class="es">Comportamiento idéntico en Python y Node: el mismo CLI <code>ghlike</code>, la misma librería, los mismos códigos de salida. Cero dependencias en los dos.</span>
+    <span class="en">Identical behavior in Python and Node: the same <code>ghlike</code> CLI, the same library, the same exit codes. Zero dependencies in both.</span>
   </p>
-
-  <!-- estado en vivo del daemon · live daemon status -->
-  <div class="daemon-banner checking" id="daemon-banner" role="status" aria-live="polite">
-    <span class="dot" aria-hidden="true"></span>
-    <div>
-      <span class="es check-only"><strong>Buscando el daemon local…</strong></span>
-      <span class="en check-only"><strong>Looking for the local daemon…</strong></span>
-      <span class="es on-only"><strong>Daemon conectado.</strong> Todos los botones <code>&lt;gh-like&gt;</code> de esta página dan like con un clic (~8–12&nbsp;s por clic: tu navegador pulsa el botón real de GitHub). Cierra el daemon con <code>Ctrl+C</code> al terminar.</span>
-      <span class="en on-only"><strong>Daemon connected.</strong> Every <code>&lt;gh-like&gt;</code> button on this page likes with one click (~8–12&nbsp;s per click: your browser presses GitHub’s real button). Close the daemon with <code>Ctrl+C</code> when done.</span>
-      <span class="es off-only"><strong>Daemon no detectado.</strong> Sin él, el clic abre el repo en una pestaña nueva. Para dar like con un clic desde aquí: instala el CLI con <code>pipx</code> o <code>npm</code> y ejecuta <code>ghlike daemon</code> — los 2 pasos, justo debajo.</span>
-      <span class="en off-only"><strong>No daemon detected.</strong> Without it, clicking opens the repo in a new tab. To like with one click from here: install the CLI with <code>pipx</code> or <code>npm</code> and run <code>ghlike daemon</code> — the 2 steps, right below.</span>
-    </div>
-  </div>
-
   <div class="grid c2">
     <div class="card">
       <div class="pkg">
         <code class="name">ghlike</code>
-        <span class="tag">CLI</span>
         <span class="tag">PyPI</span>
-        <span class="tag">npm</span>
+        <span class="tag">Python ≥ 3.9</span>
       </div>
-      <p>
-        <span class="es">Likes (stars) desde el terminal con la sesión de tu navegador. Cero dependencias — Python&nbsp;≥&nbsp;3.9 y Node&nbsp;≥&nbsp;22.</span>
-        <span class="en">Likes (stars) from the terminal using your browser session. Zero dependencies — Python&nbsp;≥&nbsp;3.9 and Node&nbsp;≥&nbsp;22.</span>
-      </p>
       <div class="code" style="width:100%; max-width:none; margin:4px 0">
-        <div class="codebar"><span class="lang">bash</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-        <pre><code>pipx install ghlike  <span class="c"># o · or: npm install -g ghlike</span></code></pre>
-      </div>
-      <div class="demo-zone">
-        <gh-like repo="686f6c61/ghlike"></gh-like>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="pkg">
-        <code class="name">ghlike-widget</code>
-        <span class="tag">npm</span>
-        <span class="tag">web component</span>
-      </div>
-      <p>
-        <span class="es">El botón <code>&lt;gh-like&gt;</code> para tu web, con contador de stars en vivo, modo oscuro automático y 5 variantes. Un fichero, cero dependencias.</span>
-        <span class="en">The <code>&lt;gh-like&gt;</code> button for your website, with a live star counter, automatic dark mode and 5 variants. One file, zero dependencies.</span>
-      </p>
-      <div class="code" style="width:100%; max-width:none; margin:4px 0">
-        <div class="codebar"><span class="lang">html</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-        <pre><code><span class="p">&lt;gh-like</span> repo=<span class="c">"686f6c61/ghlike"</span> variant=<span class="c">"pill"</span><span class="p">&gt;&lt;/gh-like&gt;</span></code></pre>
-      </div>
-      <div class="demo-zone">
-        <gh-like repo="686f6c61/ghlike" variant="pill"></gh-like>
-      </div>
-    </div>
-  </div>
-
-  <h3>
-    <span class="es">Activa el like con un clic — 2 pasos</span>
-    <span class="en">Enable one-click likes — 2 steps</span>
-  </h3>
-  <p>
-    <span class="es">El daemon es la vía sin extensión: instala el CLI, déjalo corriendo en un terminal, y todos los botones <code>&lt;gh-like&gt;</code> de esta página pasan a dar like con un clic usando la sesión de github.com de tu navegador.</span>
-    <span class="en">The daemon is the extension-free path: install the CLI, keep it running in a terminal, and every <code>&lt;gh-like&gt;</code> button on this page becomes one-click, using your browser’s github.com session.</span>
-  </p>
-  <p style="margin-bottom:8px"><strong>
-    <span class="es">Paso 1 · Instala el CLI (elige uno):</span>
-    <span class="en">Step 1 · Install the CLI (pick one):</span>
-  </strong></p>
-  <div class="grid c2">
-    <div class="code" style="max-width:none; margin:8px 0">
-      <div class="codebar"><span class="lang">bash · Python ≥ 3.9</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-      <pre><code>pipx install ghlike</code></pre>
-    </div>
-    <div class="code" style="max-width:none; margin:8px 0">
-      <div class="codebar"><span class="lang">bash · Node ≥ 22</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-      <pre><code>npm install -g ghlike</code></pre>
-    </div>
-  </div>
-  <p style="margin-bottom:8px"><strong>
-    <span class="es">Paso 2 · Arranca el daemon y vuelve aquí:</span>
-    <span class="en">Step 2 · Start the daemon and come back here:</span>
-  </strong></p>
-  <div class="code">
-    <div class="codebar"><span class="lang">terminal</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code><span class="p">$</span> ghlike daemon
-<span class="out">ghlike daemon escuchando en http://127.0.0.1:8469</span>
-<span class="out">Ctrl+C para parar…</span>
-<span class="c"># el indicador de arriba pasa a verde · the indicator above turns green</span></code></pre>
-  </div>
-  <div class="note">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-    <p>
-      <span class="es"><strong>Condiciones</strong>: sesión de github.com en un navegador Chromium (Brave, Chrome, Edge…) de esta máquina · el subcomando <code>daemon</code> viaja en <code>ghlike</code> de npm (≥&nbsp;0.1.3); en PyPI llega con la próxima versión · si un clic falla, reinténtalo · si ya tienes la <a href="#extension">extensión</a>, no necesitas el daemon · páralo con <code>Ctrl+C</code> al acabar.</span>
-      <span class="en"><strong>Requirements</strong>: a github.com session in a Chromium browser (Brave, Chrome, Edge…) on this machine · the <code>daemon</code> subcommand ships in npm’s <code>ghlike</code> (≥&nbsp;0.1.3); on PyPI it lands with the next release · if a click fails, retry · if you already have the <a href="#extension">extension</a>, you don’t need the daemon · stop it with <code>Ctrl+C</code> when done.</span>
-    </p>
-  </div>
-
-  <h3>
-    <span class="es">¿Qué pasa al hacer clic?</span>
-    <span class="en">What happens when you click?</span>
-  </h3>
-  <p>
-    <span class="es">El widget se adapta a lo que tenga instalado el visitante. Nunca queda roto:</span>
-    <span class="en">The widget adapts to whatever the visitor has installed. It is never broken:</span>
-  </p>
-  <div class="grid c3">
-    <div class="card icard">
-      <h4>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.7 2.7 0 010 5.4H2V20a2 2 0 002 2h3.8v-1.5a2.7 2.7 0 015.4 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 000-5z"/></svg>
-        <span class="es">Con la extensión</span><span class="en">With the extension</span>
-      </h4>
-      <p>
-        <span class="es">Un clic da la star en el sitio, sin salir de la página (~2–4&nbsp;s).</span>
-        <span class="en">One click stars in place, without leaving the page (~2–4&nbsp;s).</span>
-      </p>
-    </div>
-    <div class="card icard">
-      <h4>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm1 4v2h6V8H4zm0 4v2h4v-2H4zm4.8 6l4.2-8 4.2 8H8.8z" transform="scale(1 .9) translate(0 1)"/></svg>
-        <span class="es">Con el daemon local</span><span class="en">With the local daemon</span>
-      </h4>
-      <p>
-        <span class="es"><code>ghlike daemon</code> → un clic en cualquier navegador de tu máquina, incluidos los embebidos.</span>
-        <span class="en"><code>ghlike daemon</code> → one click in any browser on your machine, embedded ones included.</span>
-      </p>
-    </div>
-    <div class="card icard">
-      <h4>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7zM5 5h4V3H3v18h18v-6h-2v4H5V5z"/></svg>
-        <span class="es">Sin nada instalado</span><span class="en">Nothing installed</span>
-      </h4>
-      <p>
-        <span class="es">El clic explica aquí mismo cómo activar el like con un clic — y deja el enlace para dar la star a mano, solo si lo pides.</span>
-        <span class="en">The click explains right here how to enable one-click likes — with the manual star link only if you ask for it.</span>
-      </p>
-    </div>
-  </div>
-
-  <div class="note">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-    <p>
-      <span class="es"><strong>El contador de stars</strong> viene de la API pública de GitHub (CORS, sin clave), con caché de 1&nbsp;hora por repo. Los clics con daemon tardan ~8–12&nbsp;s: el navegador real pulsa el botón de Star con tu sesión.</span>
-      <span class="en"><strong>The star counter</strong> comes from GitHub’s public API (CORS, no key), cached for 1&nbsp;hour per repo. Daemon clicks take ~8–12&nbsp;s: your real browser presses the Star button with your session.</span>
-    </p>
-  </div>
-</section>
-
-<!-- ================= WIDGET: CÓMO PONERLO ================= -->
-<section class="section steps" id="widget">
-  <span class="kicker">widget</span>
-  <h2>
-    <span class="es">Pon el botón en tu web</span>
-    <span class="en">Put the button on your website</span>
-  </h2>
-  <p class="lead">
-    <span class="es">Dos pasos y listo: carga el script una vez, y pon el botón donde quieras con una etiqueta HTML.</span>
-    <span class="en">Two steps and you’re done: load the script once, then place the button anywhere with a single HTML tag.</span>
-  </p>
-
-  <h3><span class="n">1</span><span class="es">Carga el script</span><span class="en">Load the script</span></h3>
-  <p>
-    <span class="es">Desde el CDN oficial, una vez por página (antes de <code>&lt;/body&gt;</code>):</span>
-    <span class="en">From the official CDN, once per page (before <code>&lt;/body&gt;</code>):</span>
-  </p>
-  <div class="code">
-    <div class="codebar"><span class="lang">html</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code><span class="c">&lt;!-- carga el widget una vez por página · load the widget once per page --&gt;</span>
-<span class="p">&lt;script</span> type=<span class="c">"module"</span> src=<span class="c">"https://cdn.jsdelivr.net/npm/ghlike-widget"</span><span class="p">&gt;&lt;/script&gt;</span></code></pre>
-  </div>
-  <p>
-    <span class="es">O desde npm, si bundlean tu web:</span>
-    <span class="en">Or from npm, if you bundle your site:</span>
-  </p>
-  <div class="code">
-    <div class="codebar"><span class="lang">bash + js</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code>npm install ghlike-widget</code></pre>
-  </div>
-  <div class="code">
-    <div class="codebar"><span class="lang">js</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code><span class="c">// en tu JS de entrada · in your entry JS</span>
-<span class="p">import</span> <span class="c">"ghlike-widget"</span>;</code></pre>
-  </div>
-  <div class="note">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-    <p>
-      <span class="es">El widget también viaja hoy dentro del paquete del CLI, por si lo prefieres: <code>&lt;script type="module" src="https://unpkg.com/ghlike/widget"&gt;&lt;/script&gt;</code>.</span>
-      <span class="en">The widget also ships today inside the CLI package, if you prefer: <code>&lt;script type="module" src="https://unpkg.com/ghlike/widget"&gt;&lt;/script&gt;</code>.</span>
-    </p>
-  </div>
-
-  <h3><span class="n">2</span><span class="es">Pon el botón donde quieras</span><span class="en">Place the button anywhere</span></h3>
-  <p>
-    <span class="es">Una etiqueta con el repo destino. Acepta <code>owner/repo</code> o la URL completa de GitHub:</span>
-    <span class="en">One tag with the target repo. It accepts <code>owner/repo</code> or the full GitHub URL:</span>
-  </p>
-  <div class="code">
-    <div class="codebar"><span class="lang">html</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code><span class="c">&lt;!-- el botón · the button --&gt;</span>
-<span class="p">&lt;gh-like</span> repo=<span class="c">"686f6c61/ghlike"</span><span class="p">&gt;&lt;/gh-like&gt;</span>
-
-<span class="c">&lt;!-- también vale la URL completa · the full URL works too --&gt;</span>
-<span class="p">&lt;gh-like</span> repo=<span class="c">"https://github.com/vercel/next.js"</span><span class="p">&gt;&lt;/gh-like&gt;</span></code></pre>
-  </div>
-  <p>
-    <span class="es">Resultado real de la primera línea:</span>
-    <span class="en">Real result of the first line:</span>
-  </p>
-  <div class="preview" style="margin:12px 0 26px">
-    <gh-like repo="686f6c61/ghlike"></gh-like>
-  </div>
-
-  <h3><span class="n">3</span><span class="es">Sin configurar nada más, ya tienes…</span><span class="en">With zero extra config, you already get…</span></h3>
-  <ul class="feats">
-    <li>
-      <span class="es"><strong>Contador de stars en vivo</strong> (API pública de GitHub, con caché para no gastar cuota).</span>
-      <span class="en"><strong>Live star count</strong> (GitHub public API, cached so you don’t burn quota).</span>
-    </li>
-    <li>
-      <span class="es"><strong>Modo oscuro automático</strong> — o síncrono con el tema de tu web (ver la sección «Botones»).</span>
-      <span class="en"><strong>Automatic dark mode</strong> — or synced to your site’s theme (see the “Buttons” section).</span>
-    </li>
-    <li>
-      <span class="es"><strong>Estados visuales</strong>: «Liked» al dar la star, indicador de ocupado y mensajes de error claros.</span>
-      <span class="en"><strong>Visual states</strong>: “Liked” after starring, busy indicator and clear error messages.</span>
-    </li>
-    <li>
-      <span class="es"><strong>Un fichero, cero dependencias</strong>, ~250 líneas auditables. El fallback clásico garantiza que el botón nunca quede roto.</span>
-      <span class="en"><strong>One file, zero dependencies</strong>, ~250 auditable lines. The classic fallback guarantees the button is never broken.</span>
-    </li>
-  </ul>
-</section>
-
-<!-- ================= PERSONALIZAR LOS BOTONES ================= -->
-<section class="section" id="customize">
-  <span class="kicker"><span class="es">personalización</span><span class="en">customization</span></span>
-  <h2>
-    <span class="es">Cambia los botones a tu gusto</span>
-    <span class="en">Make the buttons yours</span>
-  </h2>
-  <p class="lead">
-    <span class="es">Tres niveles: elige una <strong>variante</strong> predefinida con un atributo, retoca cualquier color con <strong>variables CSS</strong>, o entra al detalle con <strong>shadow parts</strong>. Todo se controla desde el CSS de tu propia página — sin reescribir el widget.</span>
-    <span class="en">Three levels: pick a predefined <strong>variant</strong> with one attribute, tweak any color with <strong>CSS variables</strong>, or go deeper with <strong>shadow parts</strong>. Everything is controlled from your own page’s CSS — no need to rewrite the widget.</span>
-  </p>
-
-  <h3><span class="es">1 · Las 5 variantes — atributo <code>variant</code></span><span class="en">1 · The 5 variants — <code>variant</code> attribute</span></h3>
-  <div class="grid c5">
-    <div class="card">
-      <h4>classic</h4>
-      <p><span class="es">Por defecto, estilo GitHub.</span><span class="en">Default, GitHub-like.</span></p>
-      <div class="demo-zone"><gh-like repo="cli/cli"></gh-like></div>
-    </div>
-    <div class="card">
-      <h4>pill</h4>
-      <p><span class="es">Oscuro y redondeado.</span><span class="en">Dark and rounded.</span></p>
-      <div class="demo-zone"><gh-like repo="vercel/next.js" variant="pill"></gh-like></div>
-    </div>
-    <div class="card">
-      <h4>outline</h4>
-      <p><span class="es">Azul, ligero, tipo enlace.</span><span class="en">Blue, light, link-style.</span></p>
-      <div class="demo-zone"><gh-like repo="microsoft/vscode" variant="outline"></gh-like></div>
-    </div>
-    <div class="card gradient">
-      <h4 style="color:#fff">glass</h4>
-      <p><span class="es">Cristal: para héroes con degradado o foto.</span><span class="en">Glass: for gradient or photo heroes.</span></p>
-      <div class="demo-zone" style="border-color:rgba(255,255,255,.35)"><gh-like repo="rust-lang/rust" variant="glass"></gh-like></div>
-    </div>
-    <div class="card">
-      <h4>block</h4>
-      <p><span class="es">Llamada a la acción, ancho completo.</span><span class="en">Call to action, full width.</span></p>
-      <div class="demo-zone"><gh-like repo="python/cpython" variant="block" style="--ghlike-min-width:0"></gh-like></div>
-    </div>
-  </div>
-  <div class="code">
-    <div class="codebar"><span class="lang">html</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code><span class="p">&lt;gh-like</span> repo=<span class="c">"owner/repo"</span><span class="p">&gt;&lt;/gh-like&gt;</span>                          <span class="c">classic · default</span>
-<span class="p">&lt;gh-like</span> repo=<span class="c">"owner/repo"</span> variant=<span class="c">"pill"</span><span class="p">&gt;&lt;/gh-like&gt;</span>             <span class="c">pill</span>
-<span class="p">&lt;gh-like</span> repo=<span class="c">"owner/repo"</span> variant=<span class="c">"outline"</span><span class="p">&gt;&lt;/gh-like&gt;</span>           <span class="c">outline</span>
-<span class="p">&lt;gh-like</span> repo=<span class="c">"owner/repo"</span> variant=<span class="c">"glass"</span><span class="p">&gt;&lt;/gh-like&gt;</span>             <span class="c">glass · héroes/heroes</span>
-<span class="p">&lt;gh-like</span> repo=<span class="c">"owner/repo"</span> variant=<span class="c">"block"</span><span class="p">&gt;&lt;/gh-like&gt;</span>             <span class="c">block · CTA</span></code></pre>
-  </div>
-
-  <h3><span class="es">2 · Variables CSS — <code>--ghlike-*</code></span><span class="en">2 · CSS variables — <code>--ghlike-*</code></span></h3>
-  <p>
-    <span class="es">Cualquier valor del botón se cambia desde tu hoja de estilos. Ejemplo — un botón rosa:</span>
-    <span class="en">Every button value can be changed from your stylesheet. Example — a pink button:</span>
-  </p>
-  <div class="code">
-    <div class="codebar"><span class="lang">css</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code>gh-like<span class="p">.mi-estilo</span> {
-  <span class="c">/* fondo · background */</span>        --ghlike-bg: <span class="c">#fff0f6</span>;
-  <span class="c">/* borde · border */</span>           --ghlike-border: <span class="c">#ff2d87</span>;
-  <span class="c">/* texto · text */</span>             --ghlike-fg: <span class="c">#c2185b</span>;
-  <span class="c">/* estrella · star */</span>          --ghlike-star: <span class="c">#ff2d87</span>;
-  <span class="c">/* esquinas · corners */</span>       --ghlike-radius: <span class="c">4px</span>;
-  <span class="c">/* relleno · padding */</span>        --ghlike-padding: <span class="c">8px 16px</span>;
-}</code></pre>
-  </div>
-  <div class="preview" style="margin:12px 0 24px">
-    <gh-like class="pink" repo="torvalds/linux"></gh-like>
-  </div>
-  <p>
-    <span class="es">Referencia completa de variables (valores por defecto del tema claro):</span>
-    <span class="en">Full variable reference (light-theme defaults):</span>
-  </p>
-  <div class="tablewrap">
-    <table>
-      <thead>
-        <tr>
-          <th><span class="es">variable</span><span class="en">variable</span></th>
-          <th><span class="es">qué controla</span><span class="en">controls</span></th>
-          <th><span class="es">por defecto</span><span class="en">default</span></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td><code>--ghlike-bg</code></td><td><span class="es">fondo del botón</span><span class="en">button background</span></td><td><code>#f6f8fa</code></td></tr>
-        <tr><td><code>--ghlike-bg-hover</code></td><td><span class="es">fondo al pasar el ratón</span><span class="en">hover background</span></td><td><code>#eef1f4</code></td></tr>
-        <tr><td><code>--ghlike-fg</code></td><td><span class="es">color del texto</span><span class="en">text color</span></td><td><code>#24292f</code></td></tr>
-        <tr><td><code>--ghlike-border</code></td><td><span class="es">color del borde</span><span class="en">border color</span></td><td><code>#d0d7de</code></td></tr>
-        <tr><td><code>--ghlike-radius</code></td><td><span class="es">redondeo de esquinas</span><span class="en">corner radius</span></td><td><code>6px</code></td></tr>
-        <tr><td><code>--ghlike-padding</code></td><td><span class="es">relleno interno</span><span class="en">inner padding</span></td><td><code>5px 14px</code></td></tr>
-        <tr><td><code>--ghlike-gap</code></td><td><span class="es">espacio icono–texto</span><span class="en">icon–text gap</span></td><td><code>7px</code></td></tr>
-        <tr><td><code>--ghlike-icon</code></td><td><span class="es">tamaño de la estrella</span><span class="en">star icon size</span></td><td><code>15px</code></td></tr>
-        <tr><td><code>--ghlike-font-size</code></td><td><span class="es">tamaño de letra</span><span class="en">font size</span></td><td><code>14px</code></td></tr>
-        <tr><td><code>--ghlike-star</code></td><td><span class="es">color de la estrella</span><span class="en">star color</span></td><td><code>#9a6700</code></td></tr>
-        <tr><td><code>--ghlike-star-on</code></td><td><span class="es">estrella en estado «Liked»</span><span class="en">star when “Liked”</span></td><td><code>#eac54f</code></td></tr>
-        <tr><td><code>--ghlike-on-bg / on-border / on-fg</code></td><td><span class="es">colores del estado «Liked»</span><span class="en">“Liked” state colors</span></td><td><code>#fff8c5 · #d4a72c · #24292f</code></td></tr>
-        <tr><td><code>--ghlike-min-width</code></td><td><span class="es">ancho mínimo (variante <code>block</code>)</span><span class="en">min width (<code>block</code> variant)</span></td><td><code>220px</code></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h3><span class="es">3 · Shadow parts — <code>::part()</code></span><span class="en">3 · Shadow parts — <code>::part()</code></span></h3>
-  <p>
-    <span class="es">El botón expone tres partes del shadow DOM que puedes estilizar directamente: <code>::part(button)</code>, <code>::part(label)</code> y <code>::part(count)</code>.</span>
-    <span class="en">The button exposes three shadow-DOM parts you can style directly: <code>::part(button)</code>, <code>::part(label)</code> and <code>::part(count)</code>.</span>
-  </p>
-  <div class="code">
-    <div class="codebar"><span class="lang">css</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code>gh-like<span class="p">::part(button)</span> { font-weight: <span class="c">700</span>; letter-spacing: <span class="c">.4px</span>; }
-gh-like<span class="p">::part(count)</span> { font-size: <span class="c">13px</span>; }</code></pre>
-  </div>
-  <div class="preview" style="margin:12px 0 24px">
-    <gh-like class="fancy" repo="golang/go"></gh-like>
-  </div>
-
-  <h3><span class="es">4 · Modo oscuro y tema de tu web</span><span class="en">4 · Dark mode and your site’s theme</span></h3>
-  <p>
-    <span class="es">La variante <code>classic</code> sigue <code>prefers-color-scheme</code> del sistema por defecto. Si tu web cambia de tema con un atributo (como esta página), los estilos de la página <strong>siempre ganan</strong> a los internos del widget — esta es la técnica para sincronizarlos:</span>
-    <span class="en">The <code>classic</code> variant follows the system’s <code>prefers-color-scheme</code> by default. If your site switches themes with an attribute (like this page does), page styles <strong>always win</strong> over the widget’s internal ones — this is the technique to sync them:</span>
-  </p>
-  <div class="code">
-    <div class="codebar"><span class="lang">css</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code><span class="c">/* cuando TU web está en oscuro · when YOUR site is dark */</span>
-html[data-theme=<span class="c">"dark"</span>] gh-like {
-  --ghlike-bg: <span class="c">#26282d</span>; --ghlike-fg: <span class="c">#e6edf3</span>;
-  --ghlike-border: <span class="c">#42474e</span>; --ghlike-star: <span class="c">#d29922</span>;
-}</code></pre>
-  </div>
-  <div class="note">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-    <p>
-      <span class="es">Pruébalo aquí mismo: cambia el tema de la página con el botón de la luna del header y mira cómo los widgets de arriba acompañan.</span>
-      <span class="en">Try it right here: switch the page theme with the moon button in the header and watch the widgets above follow along.</span>
-    </p>
-  </div>
-
-  <h3><span class="es">5 · Pruébalo en vivo</span><span class="en">5 · Try it live</span></h3>
-  <div class="playground">
-    <div class="row" role="group" aria-label="variante / variant">
-      <span style="font-size:13.5px; color:var(--text-2); font-weight:600">variant:</span>
-      <button class="vchip on" data-variant="classic" type="button">classic</button>
-      <button class="vchip" data-variant="pill" type="button">pill</button>
-      <button class="vchip" data-variant="outline" type="button">outline</button>
-      <button class="vchip" data-variant="glass" type="button">glass</button>
-      <button class="vchip" data-variant="block" type="button">block</button>
-    </div>
-    <div class="row">
-      <input id="pg-repo" type="text" value="686f6c61/ghlike" aria-label="repo"
-             placeholder='owner/repo · o URL completa / or full URL'>
-      <button class="btn tonal small" id="pg-set" type="button">
-        <span class="es">Apuntar</span><span class="en">Point</span>
-      </button>
-    </div>
-    <div class="preview"><gh-like id="pg-btn" repo="686f6c61/ghlike"></gh-like></div>
-    <div class="code" style="max-width:none; margin:14px 0 0">
-      <div class="codebar"><span class="lang">html</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-      <pre><code id="pg-code"></code></pre>
-    </div>
-  </div>
-</section>
-
-<!-- ================= CLI ================= -->
-<section class="section steps" id="cli">
-  <span class="kicker">cli</span>
-  <h2>
-    <span class="es">El CLI: likes desde el terminal</span>
-    <span class="en">The CLI: likes from the terminal</span>
-  </h2>
-  <p class="lead">
-    <span class="es">Dos paquetes gemelos con comportamiento idéntico — elige tu ecosistema. Encuentra tu sesión de github.com en cualquier navegador Chromium (Brave, Chrome, Chromium, Edge, Vivaldi, Opera), y da stars sin <code>gh auth</code> ni tokens.</span>
-    <span class="en">Two twin packages with identical behavior — pick your ecosystem. They find your github.com session in any Chromium browser (Brave, Chrome, Chromium, Edge, Vivaldi, Opera) and give stars with no <code>gh auth</code> and no tokens.</span>
-  </p>
-
-  <h3><span class="n">1</span><span class="es">Instala el paquete</span><span class="en">Install the package</span></h3>
-  <div class="grid c2">
-    <div>
-      <p style="margin-top:0"><strong>Python</strong> <span class="es">≥ 3.9 · cero dependencias</span><span class="en">≥ 3.9 · zero dependencies</span></p>
-      <div class="code" style="max-width:none">
         <div class="codebar"><span class="lang">bash</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
         <pre><code>pipx install ghlike   <span class="c"># o · or: pip install --user ghlike</span></code></pre>
       </div>
+      <p>
+        <span class="es">Código: <a href="https://github.com/686f6c61/ghlike-py" target="_blank" rel="noopener">686f6c61/ghlike-py</a> · Paquete: <a href="https://pypi.org/project/ghlike/" target="_blank" rel="noopener">pypi.org/project/ghlike</a></span>
+        <span class="en">Source: <a href="https://github.com/686f6c61/ghlike-py" target="_blank" rel="noopener">686f6c61/ghlike-py</a> · Package: <a href="https://pypi.org/project/ghlike/" target="_blank" rel="noopener">pypi.org/project/ghlike</a></span>
+      </p>
     </div>
-    <div>
-      <p style="margin-top:0"><strong>Node</strong> <span class="es">≥ 22 · cero dependencias</span><span class="en">≥ 22 · zero dependencies</span></p>
-      <div class="code" style="max-width:none">
+    <div class="card">
+      <div class="pkg">
+        <code class="name">ghlike</code>
+        <span class="tag">npm</span>
+        <span class="tag">Node ≥ 22</span>
+      </div>
+      <div class="code" style="width:100%; max-width:none; margin:4px 0">
         <div class="codebar"><span class="lang">bash</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
         <pre><code>npm install -g ghlike</code></pre>
       </div>
+      <p>
+        <span class="es">Código: <a href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">686f6c61/ghlike</a> · Paquete: <a href="https://www.npmjs.com/package/ghlike" target="_blank" rel="noopener">npmjs.com/package/ghlike</a></span>
+        <span class="en">Source: <a href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">686f6c61/ghlike</a> · Package: <a href="https://www.npmjs.com/package/ghlike" target="_blank" rel="noopener">npmjs.com/package/ghlike</a></span>
+      </p>
     </div>
   </div>
+  <div class="note">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    <p>
+      <span class="es"><strong>Requisito</strong>: una sesión de github.com iniciada en un navegador Chromium de tu máquina (Brave, Chrome, Chromium, Edge, Vivaldi, Opera). No necesitas tokens ni <code>gh auth</code>.</span>
+      <span class="en"><strong>Requirement</strong>: a github.com session in a Chromium browser on your machine (Brave, Chrome, Chromium, Edge, Vivaldi, Opera). No tokens and no <code>gh auth</code> needed.</span>
+    </p>
+  </div>
+</section>
 
-  <h3><span class="n">2</span><span class="es">Da tu primer like</span><span class="en">Give your first like</span></h3>
+<!-- ================= USO DEL CLI ================= -->
+<section class="section steps" id="usage">
+  <span class="kicker">cli</span>
+  <h2>
+    <span class="es">Uso del CLI</span>
+    <span class="en">CLI usage</span>
+  </h2>
+  <p class="lead">
+    <span class="es">Un solo comando para todo: dar star, quitarla, consultar el estado o invertirla. Acepta <code>owner/repo</code> o la URL completa de GitHub.</span>
+    <span class="en">One command for everything: star, unstar, check the state or flip it. It accepts <code>owner/repo</code> or the full GitHub URL.</span>
+  </p>
+
+  <h3><span class="n">1</span><span class="es">Da tu primera star</span><span class="en">Give your first star</span></h3>
   <div class="code">
     <div class="codebar"><span class="lang">terminal</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
     <pre><code><span class="p">$</span> ghlike 686f6c61/ghlike
 <span class="out">686f6c61/ghlike: like dado ★ [your-user via Brave]</span></code></pre>
   </div>
-  <p>
-    <span class="es">Todas las opciones — acepta <code>owner/repo</code> o la URL completa:</span>
-    <span class="en">All the options — it accepts <code>owner/repo</code> or the full URL:</span>
-  </p>
+
+  <h3><span class="n">2</span><span class="es">Todas las opciones</span><span class="en">All the options</span></h3>
   <div class="code">
     <div class="codebar"><span class="lang">bash</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code>ghlike owner/repo                  <span class="c"># dar like · give a like (idempotente · idempotent)</span>
+    <pre><code>ghlike owner/repo                  <span class="c"># dar star · star (idempotente · idempotent)</span>
 ghlike https://github.com/o/r      <span class="c"># URLs completas valen · full URLs work</span>
 ghlike owner/repo -c               <span class="c"># consultar estado · check state only</span>
-ghlike owner/repo -u               <span class="c"># quitar like · unstar</span>
+ghlike owner/repo -u               <span class="c"># quitar star · unstar</span>
 ghlike owner/repo --toggle         <span class="c"># invertir · flip</span>
 ghlike --list                      <span class="c"># sesiones encontradas · sessions found</span>
 ghlike --browser brave owner/repo  <span class="c"># forzar navegador · force one browser</span>
-ghlike owner/repo --json           <span class="c"># salida para scripts · scriptable output</span>
-ghlike daemon                      <span class="c"># servidor local para widgets · local server for widgets</span></code></pre>
+ghlike owner/repo --json           <span class="c"># salida para scripts · scriptable output</span></code></pre>
   </div>
-
-  <h3><span class="n">3</span><span class="es">El daemon: botones con un clic en tu máquina</span><span class="en">The daemon: one-click buttons on your machine</span></h3>
   <p>
-    <span class="es"><code>ghlike daemon</code> levanta un servidor local en <code>127.0.0.1:8469</code>. Mientras corra, cualquier botón <code>&lt;gh-like&gt;</code> de las páginas que tengas abiertas funciona con un clic — en cualquier navegador de tu máquina, incluidos los embebidos que no pueden cargar extensiones. Es una herramienta de desarrollo y pruebas: páralo al acabar.</span>
-    <span class="en"><code>ghlike daemon</code> starts a local server on <code>127.0.0.1:8469</code>. While it runs, every <code>&lt;gh-like&gt;</code> button on the pages you have open works with one click — in any browser on your machine, including embedded ones that can’t load extensions. It’s a development/testing tool: stop it when you’re done.</span>
+    <span class="es">Cada operación tarda ~8–12&nbsp;s: tu propio navegador arranca en segundo plano, pulsa el botón de Star real y se cierra. Ver <a href="#how">cómo funciona</a>.</span>
+    <span class="en">Each operation takes ~8–12&nbsp;s: your own browser starts in the background, presses the real Star button and closes. See <a href="#how">how it works</a>.</span>
   </p>
+</section>
 
-  <h3><span class="es">Como librería</span><span class="en">As a library</span></h3>
+<!-- ================= COMO LIBRERÍA ================= -->
+<section class="section" id="library">
+  <span class="kicker"><span class="es">librería</span><span class="en">library</span></span>
+  <h2>
+    <span class="es">También como librería</span>
+    <span class="en">Also as a library</span>
+  </h2>
+  <p class="lead">
+    <span class="es">Las mismas operaciones desde tu código, con la misma API en Python y en Node.</span>
+    <span class="en">The same operations from your code, with the same API in Python and Node.</span>
+  </p>
   <div class="grid c2">
     <div class="code" style="max-width:none">
       <div class="codebar"><span class="lang">python</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
@@ -979,7 +500,7 @@ unstar(<span class="c">"vercel/next.js"</span>, browser=<span class="c">"brave"<
     <table>
       <thead><tr><th><span class="es">código</span><span class="en">code</span></th><th><span class="es">significa</span><span class="en">meaning</span></th></tr></thead>
       <tbody>
-        <tr><td><code>0</code></td><td><span class="es">éxito (también «ya tenía like»)</span><span class="en">success (including “already starred”)</span></td></tr>
+        <tr><td><code>0</code></td><td><span class="es">éxito (también «ya tenía star»)</span><span class="en">success (including “already starred”)</span></td></tr>
         <tr><td><code>1</code></td><td><span class="es">error genérico (navegador falló, cambió el markup…)</span><span class="en">generic error (browser failed, markup changed…)</span></td></tr>
         <tr><td><code>2</code></td><td><span class="es">no hay sesión de github.com en ningún navegador soportado</span><span class="en">no github.com session in any supported browser</span></td></tr>
         <tr><td><code>3</code></td><td><span class="es">el repo no existe</span><span class="en">repo not found</span></td></tr>
@@ -988,60 +509,35 @@ unstar(<span class="c">"vercel/next.js"</span>, browser=<span class="c">"brave"<
   </div>
 </section>
 
-<!-- ================= EXTENSIÓN ================= -->
-<section class="section" id="extension">
-  <span class="kicker"><span class="es">extensión</span><span class="en">extension</span></span>
+<!-- ================= CÓMO FUNCIONA ================= -->
+<section class="section" id="how">
+  <span class="kicker"><span class="es">cómo funciona</span><span class="en">how it works</span></span>
   <h2>
-    <span class="es">La extensión: likes con un clic para tus visitantes</span>
-    <span class="en">The extension: one-click likes for your visitors</span>
+    <span class="es">Qué pasa cuando ejecutas <code>ghlike owner/repo</code></span>
+    <span class="en">What happens when you run <code>ghlike owner/repo</code></span>
   </h2>
   <p class="lead">
-    <span class="es">Se instala una vez y, a partir de ahí, todo botón <code>&lt;gh-like&gt;</code> de la web funciona con un clic usando la sesión de github.com del visitante.</span>
-    <span class="en">Install it once and, from then on, every <code>&lt;gh-like&gt;</code> button on the web works with one click using the visitor’s github.com session.</span>
+    <span class="es">Nada de APIs ni de tokens: tu propio navegador pulsa el botón de Star por ti. Cuatro pasos, ~8–12&nbsp;segundos.</span>
+    <span class="en">No APIs and no tokens: your own browser presses the Star button for you. Four steps, ~8–12&nbsp;seconds.</span>
   </p>
-
-  <h3><span class="es">Qué pasa por dentro al hacer clic</span><span class="en">What happens under the hood on click</span></h3>
   <ol class="steps-list">
     <li>
-      <span class="es">El content script de la web visitada (<code>widget-bridge.js</code>) intercepta el clic sobre <code>&lt;gh-like&gt;</code>.</span>
-      <span class="en">The content script on the visited site (<code>widget-bridge.js</code>) intercepts the click on <code>&lt;gh-like&gt;</code>.</span>
+      <span class="es"><strong>Encuentra tu sesión</strong> de github.com en un navegador Chromium de tu máquina (Brave, Chrome, Chromium, Edge, Vivaldi, Opera). Con <code>--list</code> puedes ver las sesiones detectadas.</span>
+      <span class="en"><strong>It finds your github.com session</strong> in a Chromium browser on your machine (Brave, Chrome, Chromium, Edge, Vivaldi, Opera). Use <code>--list</code> to see the detected sessions.</span>
     </li>
     <li>
-      <span class="es">El service worker abre <strong>una pestaña en segundo plano</strong> del repo en github.com.</span>
-      <span class="en">The service worker opens <strong>one background tab</strong> of the repo on github.com.</span>
+      <span class="es"><strong>Copia la tienda de cookies CIFRADA</strong> a un perfil desechable. Las cookies nunca se descifran: el fichero se copia tal cual, y el propio navegador lo abre con sus claves del sistema.</span>
+      <span class="en"><strong>It copies the ENCRYPTED cookie store</strong> to a throwaway profile. Cookies are never decrypted: the file is copied as-is, and the browser itself opens it with its system keys.</span>
     </li>
     <li>
-      <span class="es">El script de github.com pulsa el botón de Star <strong>real</strong> — el JS de la propia página envía la petición con su token CSRF — y verifica el nuevo estado.</span>
-      <span class="en">The github.com script clicks the <strong>real</strong> Star button — the page’s own JS sends the request with its CSRF token — and verifies the new state.</span>
+      <span class="es"><strong>Tu propio navegador pulsa el botón de Star real</strong>: arranca en headless, controlado por un pipe CDP privado (sin puerto TCP expuesto), abre el repo y hace clic en el botón — GitHub gestiona su propio CSRF. Luego verifica el nuevo estado.</span>
+      <span class="en"><strong>Your own browser presses the real Star button</strong>: it starts headless, driven over a private CDP pipe (no exposed TCP port), opens the repo and clicks the button — GitHub handles its own CSRF. Then it verifies the new state.</span>
     </li>
     <li>
-      <span class="es">La pestaña se cierra y el widget pasa a «Liked».</span>
-      <span class="en">The tab closes and the widget switches to “Liked”.</span>
+      <span class="es"><strong>Se cierra y limpia</strong>: el navegador se apaga y el perfil desechable se borra. Las cookies nunca se descifran ni salen de tu máquina.</span>
+      <span class="en"><strong>It closes and cleans up</strong>: the browser exits and the throwaway profile is deleted. Cookies are never decrypted and never leave your machine.</span>
     </li>
   </ol>
-
-  <h3><span class="es">Instalación (modo desarrollador)</span><span class="en">Install (developer mode)</span></h3>
-  <p>
-    <span class="es">Navegadores Chromium (Brave, Chrome, Edge…):</span>
-    <span class="en">Chromium browsers (Brave, Chrome, Edge…):</span>
-  </p>
-  <div class="code">
-    <div class="codebar"><span class="lang">bash</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-    <pre><code><span class="c"># 1 · abre brave://extensions (o chrome://extensions) y activa «Developer mode»</span>
-<span class="c">#   open brave://extensions (or chrome://extensions) and enable “Developer mode”</span>
-<span class="c"># 2 · «Load unpacked» → selecciona la carpeta extension/ del repo</span>
-<span class="c">#   “Load unpacked” → select the repo’s extension/ folder</span>
-
-<span class="c"># o lanza una instancia dedicada · or launch a dedicated instance:</span>
-brave --load-extension=$PWD/extension http://127.0.0.1:8123/site/</code></pre>
-  </div>
-  <div class="note">
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-    <p>
-      <span class="es"><strong>Mínima superficie</strong>: Manifest V3 · content scripts en sitios http/https + acceso solo a <code>https://github.com/*</code> · sin permiso amplio de pestañas, sin storage, sin código remoto · ~150 líneas de JS.</span>
-      <span class="en"><strong>Minimal surface</strong>: Manifest V3 · content scripts on http/https sites + host access only to <code>https://github.com/*</code> · no broad tabs permission, no storage, no remote code · ~150 lines of JS.</span>
-    </p>
-  </div>
 </section>
 
 <!-- ================= SEGURIDAD ================= -->
@@ -1057,10 +553,17 @@ brave --load-extension=$PWD/extension http://127.0.0.1:8123/site/</code></pre>
   </p>
   <div class="grid c2">
     <div class="card">
-      <h4><span class="es">Cero dependencias, en todas las piezas</span><span class="en">Zero dependencies, everywhere</span></h4>
+      <h4><span class="es">Cero dependencias</span><span class="en">Zero dependencies</span></h4>
       <p>
-        <span class="es">El cliente WebSocket de CDP es stdlib de Python y el WebSocket nativo de Node. Todo el proyecto: ~1.400 líneas.</span>
-        <span class="en">The CDP WebSocket client is Python stdlib and Node’s native WebSocket. The whole project: ~1,400 lines.</span>
+        <span class="es">El cliente CDP es stdlib de Python y APIs nativas de Node, hablando con el navegador por un pipe privado. Sin cadena de suministro que auditar.</span>
+        <span class="en">The CDP client is Python stdlib and Node native APIs, talking to the browser over a private pipe. No supply chain to audit.</span>
+      </p>
+    </div>
+    <div class="card">
+      <h4><span class="es">Código auditable</span><span class="en">Auditable code</span></h4>
+      <p>
+        <span class="es">~1.000 líneas por paquete, en un único fichero legible. Puedes leerlo entero antes de instalarlo.</span>
+        <span class="en">~1,000 lines per package, in a single readable file. You can read it all before installing.</span>
       </p>
     </div>
     <div class="card">
@@ -1071,24 +574,75 @@ brave --load-extension=$PWD/extension http://127.0.0.1:8123/site/</code></pre>
       </p>
     </div>
     <div class="card">
-      <h4><span class="es">El clic lo da tu propio navegador</span><span class="en">Your own browser does the clicking</span></h4>
+      <h4><span class="es">Sin tokens, sin OAuth</span><span class="en">No tokens, no OAuth</span></h4>
       <p>
-        <span class="es">Lo único que usa tu sesión es un clic en el botón de Star real — GitHub gestiona su propio CSRF.</span>
-        <span class="en">The only thing your session is ever used for is one click on the real Star button — GitHub handles its own CSRF.</span>
-      </p>
-    </div>
-    <div class="card">
-      <h4><span class="es">Contadores vía API pública</span><span class="en">Counts via the public API</span></h4>
-      <p>
-        <span class="es">Los números de stars del widget vienen de la API pública de GitHub, sin claves y con caché de 1&nbsp;h por repo.</span>
-        <span class="en">The widget’s star numbers come from GitHub’s public API, keyless and cached for 1&nbsp;h per repo.</span>
+        <span class="es">Lo único que usa tu sesión es un clic en el botón de Star real — GitHub gestiona su propio CSRF. No hay credenciales que filtrar ni revocar.</span>
+        <span class="en">The only thing your session is ever used for is one click on the real Star button — GitHub handles its own CSRF. There are no credentials to leak or revoke.</span>
       </p>
     </div>
   </div>
-  <p style="margin-top:26px">
-    <span class="es"><strong>Limitaciones</strong>: solo navegadores Chromium (Firefox no implementa CDP) · cada operación del CLI tarda ~8–12&nbsp;s · si GitHub cambia el markup del botón de Star, se arregla con una línea de selector.</span>
-    <span class="en"><strong>Limitations</strong>: Chromium browsers only (Firefox has no CDP) · each CLI operation takes ~8–12&nbsp;s · if GitHub changes the Star button markup, one selector line fixes it.</span>
-  </p>
+</section>
+
+<!-- ================= LIMITACIONES ================= -->
+<section class="section" id="limitations">
+  <span class="kicker"><span class="es">limitaciones</span><span class="en">limitations</span></span>
+  <h2>
+    <span class="es">Limitaciones conocidas</span>
+    <span class="en">Known limitations</span>
+  </h2>
+  <ul class="feats">
+    <li>
+      <span class="es"><strong>Solo navegadores Chromium</strong> (Brave, Chrome, Chromium, Edge, Vivaldi, Opera): Firefox no implementa CDP.</span>
+      <span class="en"><strong>Chromium browsers only</strong> (Brave, Chrome, Chromium, Edge, Vivaldi, Opera): Firefox has no CDP.</span>
+    </li>
+    <li>
+      <span class="es"><strong>~8–12&nbsp;s por operación</strong>: hay que arrancar el navegador, cargar el repo y pulsar el botón real. No es una API instantánea.</span>
+      <span class="en"><strong>~8–12&nbsp;s per operation</strong>: the browser has to start, load the repo and press the real button. It is not an instant API.</span>
+    </li>
+    <li>
+      <span class="es"><strong>Depende del markup del botón de Star</strong>: si GitHub lo cambia, ghlike puede fallar hasta actualizar el selector (una línea).</span>
+      <span class="en"><strong>It depends on the Star button markup</strong>: if GitHub changes it, ghlike may fail until the selector is updated (one line).</span>
+    </li>
+  </ul>
+</section>
+
+<!-- ================= ENLACES ================= -->
+<section class="section" id="links">
+  <span class="kicker"><span class="es">enlaces</span><span class="en">links</span></span>
+  <h2>
+    <span class="es">Código y paquetes</span>
+    <span class="en">Source &amp; packages</span>
+  </h2>
+  <div class="grid c4">
+    <div class="card icard">
+      <h4>
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span class="es">CLI (Node)</span><span class="en">CLI (Node)</span>
+      </h4>
+      <p><a href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">github.com/686f6c61/ghlike</a></p>
+    </div>
+    <div class="card icard">
+      <h4>
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        <span class="es">CLI (Python)</span><span class="en">CLI (Python)</span>
+      </h4>
+      <p><a href="https://github.com/686f6c61/ghlike-py" target="_blank" rel="noopener">github.com/686f6c61/ghlike-py</a></p>
+    </div>
+    <div class="card icard">
+      <h4>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 3h18v18H3V3zm9 13.5h6v-9h-6v9zm1.5-7.5h3v6h-1.5v-4.5h-1.5V9z"/></svg>
+        npm
+      </h4>
+      <p><a href="https://www.npmjs.com/package/ghlike" target="_blank" rel="noopener">npmjs.com/package/ghlike</a></p>
+    </div>
+    <div class="card icard">
+      <h4>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm-1 5h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+        PyPI
+      </h4>
+      <p><a href="https://pypi.org/project/ghlike/" target="_blank" rel="noopener">pypi.org/project/ghlike</a></p>
+    </div>
+  </div>
 </section>
 
 </div><!-- /wrap -->
@@ -1102,245 +656,20 @@ brave --load-extension=$PWD/extension http://127.0.0.1:8123/site/</code></pre>
         ghlike
       </div>
       <p style="margin:6px 0 0">
-        <span class="es">Likes de GitHub en todas partes — sin tokens.</span>
-        <span class="en">GitHub likes, everywhere — no tokens.</span>
+        <span class="es">Stars de GitHub desde el terminal — sin tokens.</span>
+        <span class="en">GitHub stars from the terminal — no tokens.</span>
         <span style="opacity:.7"> · MIT · <span id="year"></span></span>
       </p>
     </div>
     <div class="links">
-      <a href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">GitHub · ghlike</a>
+      <a href="https://github.com/686f6c61/ghlike-py" target="_blank" rel="noopener">GitHub · ghlike-py</a>
       <a href="https://www.npmjs.com/package/ghlike" target="_blank" rel="noopener">npm</a>
       <a href="https://pypi.org/project/ghlike/" target="_blank" rel="noopener">PyPI</a>
-      <a href="https://github.com/686f6c61/ghlike/blob/main/DEVELOPMENT.md" target="_blank" rel="noopener"><span class="es">Docs</span><span class="en">Docs</span></a>
     </div>
   </div>
 </footer>
 
-<!-- ================= MODAL: activar el like con un clic =================
-     Se abre cuando un visitante SIN extension ni daemon pulsa un boton:
-     en esta landing nunca le abrimos el repo en una pestaña nueva por sorpresa. -->
-<div class="overlay" id="fb-overlay" role="dialog" aria-modal="true" aria-labelledby="fb-title">
-  <div class="modal">
-    <button class="close" id="fb-close" type="button" aria-label="Cerrar · Close">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-    </button>
-    <h4 id="fb-title">
-      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
-      <span class="es">El like con un clic necesita un paso más</span>
-      <span class="en">One-click like needs one more step</span>
-    </h4>
-    <span class="repo-chip" id="fb-repo"></span>
-
-    <div class="opt">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.7 2.7 0 010 5.4H2V20a2 2 0 002 2h3.8v-1.5a2.7 2.7 0 015.4 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 000-5z"/></svg>
-      <div style="flex:1">
-        <div class="t"><span class="es">La extensión — para quien visita webs</span><span class="en">The extension — for web visitors</span></div>
-        <p>
-          <span class="es">Instálala una vez en tu navegador y todo botón <code>&lt;gh-like&gt;</code> de cualquier web dará like con un clic, sin salir de la página.</span>
-          <span class="en">Install it once in your browser and every <code>&lt;gh-like&gt;</code> button on the web likes with one click, without leaving the page.</span>
-        </p>
-        <button class="btn tonal small" id="fb-goto-ext" type="button" style="margin-top:10px">
-          <span class="es">Cómo instalarla (2 min)</span>
-          <span class="en">How to install it (2 min)</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="opt">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm2 4v2h10V7H5zm0 4v2h7v-2H5z"/></svg>
-      <div style="flex:1">
-        <div class="t"><span class="es">El CLI + daemon — para developers</span><span class="en">The CLI + daemon — for developers</span></div>
-        <p>
-          <span class="es">Instala el paquete, deja el daemon corriendo y recarga esta página: los botones pasan a dar like con un clic en tu máquina.</span>
-          <span class="en">Install the package, keep the daemon running and reload this page: the buttons become one-click on your machine.</span>
-        </p>
-        <div class="code">
-          <div class="codebar"><span class="lang">bash</span><button class="copybtn" type="button" aria-label="Copy"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg></button></div>
-          <pre><code>npm install -g ghlike && ghlike daemon</code></pre>
-        </div>
-      </div>
-    </div>
-
-    <div class="manual">
-      <span class="es">¿Sin instalar nada? </span><span class="en">No installs? </span>
-      <a id="fb-manual" href="https://github.com/686f6c61/ghlike" target="_blank" rel="noopener">
-        <span class="es">dale la star a mano en GitHub</span>
-        <span class="en">star it manually on GitHub</span> →
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- ================= WIDGET (local, con fallback CDN) =================
-     ?v=N rompe la caché cuando cambia el widget: súbelo al modificarlo. -->
-<script type="module" src="../widget/src/gh-like.js?v=1"></script>
-<script>
-(() => {
-  "use strict";
-
-  /* ---------- año del pie · footer year ---------- */
-  document.getElementById("year").textContent = new Date().getFullYear();
-
-  /* ---------- idioma · language ---------- */
-  const html = document.documentElement;
-  const TITLES = {
-    es: "ghlike — el botón de like para GitHub, sin tokens",
-    en: "ghlike — the GitHub like button, no tokens",
-  };
-  function setLang(lang) {
-    html.setAttribute("data-lang", lang);
-    html.setAttribute("lang", lang);
-    document.title = TITLES[lang];
-    document.getElementById("lang-es").classList.toggle("on", lang === "es");
-    document.getElementById("lang-en").classList.toggle("on", lang === "en");
-    try { localStorage.setItem("ghlike-site-lang", lang); } catch (e) {}
-  }
-  document.getElementById("lang-es").addEventListener("click", () => setLang("es"));
-  document.getElementById("lang-en").addEventListener("click", () => setLang("en"));
-  let stored = null;
-  try { stored = localStorage.getItem("ghlike-site-lang"); } catch (e) {}
-  setLang(stored || ((navigator.language || "es").toLowerCase().startsWith("en") ? "en" : "es"));
-
-  /* ---------- tema · theme ---------- */
-  function setTheme(t) {
-    html.setAttribute("data-theme", t);
-    try { localStorage.setItem("ghlike-site-theme", t); } catch (e) {}
-  }
-  document.getElementById("themebtn").addEventListener("click", () =>
-    setTheme(html.getAttribute("data-theme") === "dark" ? "light" : "dark"));
-  let storedTheme = null;
-  try { storedTheme = localStorage.getItem("ghlike-site-theme"); } catch (e) {}
-  setTheme(storedTheme ||
-    (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
-
-  /* ---------- copiar · copy buttons ---------- */
-  const COPY_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>';
-  const OK_SVG = '<svg class="ok" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>';
-  async function copyText(text) {
-    try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.cssText = "position:fixed;top:-999px;opacity:0";
-    document.body.appendChild(ta);
-    ta.select();
-    let ok = false;
-    try { ok = document.execCommand("copy"); } catch (e) {}
-    ta.remove();
-    return ok;
-  }
-  document.addEventListener("click", (ev) => {
-    const btn = ev.target.closest(".copybtn");
-    if (!btn) return;
-    const code = btn.closest(".code") && btn.closest(".code").querySelector("code");
-    if (!code) return;
-    copyText(code.textContent).then((ok) => {
-      if (!ok) return;
-      btn.innerHTML = OK_SVG;
-      setTimeout(() => { btn.innerHTML = COPY_SVG; }, 1400);
-    });
-  });
-
-  /* ---------- chips activos al hacer scroll · scrollspy ---------- */
-  const chipMap = new Map();
-  document.querySelectorAll(".chip[data-target]").forEach((c) => {
-    const s = document.getElementById(c.dataset.target);
-    if (s) chipMap.set(s, c);
-  });
-  if ("IntersectionObserver" in window && chipMap.size) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => {
-        if (en.isIntersecting) {
-          chipMap.forEach((c) => c.classList.remove("active"));
-          chipMap.get(en.target).classList.add("active");
-        }
-      });
-    }, { rootMargin: "-40% 0px -55% 0px" });
-    chipMap.forEach((_, s) => io.observe(s));
-  }
-
-  /* ---------- playground ---------- */
-  const pgBtn = document.getElementById("pg-btn");
-  const pgRepo = document.getElementById("pg-repo");
-  const pgCode = document.getElementById("pg-code");
-  let pgVariant = "classic";
-  function renderPg() {
-    const v = pgVariant === "classic" ? "" : ` variant="${pgVariant}"`;
-    pgCode.textContent = `<gh-like repo="${pgBtn.getAttribute("repo") || "owner/repo"}"${v}></gh-like>`;
-  }
-  document.querySelectorAll(".vchip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      document.querySelectorAll(".vchip").forEach((c) => c.classList.remove("on"));
-      chip.classList.add("on");
-      pgVariant = chip.dataset.variant;
-      pgBtn.setAttribute("variant", pgVariant);
-      renderPg();
-    });
-  });
-  function point() {
-    pgBtn.setAttribute("repo", pgRepo.value.trim() || "686f6c61/ghlike");
-    renderPg();
-  }
-  document.getElementById("pg-set").addEventListener("click", point);
-  pgRepo.addEventListener("keydown", (e) => { if (e.key === "Enter") point(); });
-  renderPg();
-
-  /* ---------- modal «like con un clic» ----------
-     El widget emite ghlike:fallback (cancelable) justo antes de abrir el
-     repo en una pestaña nueva. Aquí lo cancelamos y explicamos las dos
-     vías (extensión / CLI+daemon) sin sacar al visitante de la página. */
-  const fbOverlay = document.getElementById("fb-overlay");
-  const fbRepo = document.getElementById("fb-repo");
-  const fbManual = document.getElementById("fb-manual");
-  document.addEventListener("ghlike:fallback", (ev) => {
-    ev.preventDefault();
-    fbRepo.textContent = ev.detail.repo || "";
-    if (ev.detail.repo) fbManual.href = `https://github.com/${ev.detail.repo}`;
-    fbOverlay.classList.add("open");
-    document.getElementById("fb-close").focus();
-  });
-  function fbClose() { fbOverlay.classList.remove("open"); }
-  document.getElementById("fb-close").addEventListener("click", fbClose);
-  fbOverlay.addEventListener("click", (e) => { if (e.target === fbOverlay) fbClose(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") fbClose(); });
-  document.getElementById("fb-goto-ext").addEventListener("click", () => {
-    fbClose();
-    document.getElementById("extension").scrollIntoView({ behavior: "smooth" });
-  });
-
-  /* ---------- indicador en vivo del daemon · live daemon status ----------
-     Sondea /ping en 127.0.0.1:8469 (mismo endpoint que el widget). Rápido
-     cuando está caído (4 s), tranquilo cuando está activo (15 s).        */
-  const DAEMON_URL = "http://127.0.0.1:8469";
-  async function pingDaemon() {
-    try {
-      const ctl = new AbortController();
-      const t = setTimeout(() => ctl.abort(), 1500);
-      const res = await fetch(DAEMON_URL + "/ping", { signal: ctl.signal });
-      clearTimeout(t);
-      const info = await res.json().catch(() => null);
-      return !!(res.ok && info && info.service === "ghlike-daemon");
-    } catch (e) { return false; }
-  }
-  const daemonBanner = document.getElementById("daemon-banner");
-  (async function tickDaemon() {
-    const on = await pingDaemon();
-    daemonBanner.classList.remove("checking");
-    daemonBanner.classList.toggle("on", on);
-    setTimeout(tickDaemon, on ? 15000 : 4000);
-  })();
-
-  /* ---------- fallback: widget desde CDN si el local no cargó ----------
-     El fichero local ../widget/src/gh-like.js es el código vivo del repo.
-     Si esta página se despliega fuera del repo, cargamos el widget
-     publicado desde unpkg.                                          */
-  setTimeout(() => {
-    if (customElements.get("gh-like")) return;
-    const s = document.createElement("script");
-    s.type = "module";
-    s.src = "https://unpkg.com/ghlike/widget";
-    document.head.appendChild(s);
-  }, 1200);
-})();
-</script>
+<script src="app.js" defer></script>
 </body>
 </html>
