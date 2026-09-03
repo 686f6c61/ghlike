@@ -1,6 +1,7 @@
 /* ============================================================
-   ghlike — landing: idioma, tema, copiar, scrollspy y contador
-   de stars (API pública de GitHub). Cero dependencias.
+   ghlike — landing: idioma, tema, copiar, scrollspy, botón de
+   star del hero (extensión o pestaña nueva) y contador de
+   stars (API pública de GitHub). Cero dependencias.
    ============================================================ */
 (() => {
   "use strict";
@@ -8,8 +9,58 @@
   /* ---------- año del pie · footer year ---------- */
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* ---------- idioma · language ---------- */
   const html = document.documentElement;
+
+  /* ---------- botón de star del hero (con o sin extensión) ----------
+     Contrato con la extensión ghlike: si está instalada, su content
+     script marca el botón con data-ghlike-ext="1", intercepta el clic,
+     pone data-busy="1" durante la acción (~2-4 s) y al terminar
+     despacha CustomEvent("ghlike:update", {detail:{ok,starred,error}}).
+     Sin extensión, el clic abre el repo en una pestaña nueva.        */
+  const starBtn = document.getElementById("star-btn");
+  const starLbl = document.getElementById("star-lbl");
+  const starErr = document.getElementById("star-error");
+  const starsEl = document.getElementById("gh-stars");
+  const LBL = { es: ["Like", "Liked"], en: ["Like", "Liked"] };
+  let starred = false;   // sin sesión no se puede saber el estado inicial
+  let starCount = null;
+  function renderStarBtn() {
+    const lang = html.getAttribute("lang") === "en" ? "en" : "es";
+    starLbl.textContent = LBL[lang][starred ? 1 : 0];
+    starBtn.classList.toggle("liked", starred);
+    starBtn.setAttribute("aria-pressed", starred ? "true" : "false");
+    if (starCount !== null)
+      starsEl.textContent = starCount.toLocaleString(lang === "es" ? "es-ES" : "en-US");
+  }
+  starBtn.addEventListener("click", () => {
+    if (starBtn.getAttribute("data-ghlike-ext") === "1") return; // lo gestiona la extensión
+    window.open("https://github.com/" + starBtn.getAttribute("data-ghlike-repo"), "_blank", "noopener");
+  });
+  starBtn.addEventListener("ghlike:update", (ev) => {
+    const d = ev.detail || {};
+    if (d.ok) {
+      starred = !!d.starred;
+      if (starCount !== null) starCount = Math.max(0, starCount + (starred ? 1 : -1));
+      starErr.classList.remove("show");
+      starBtn.removeAttribute("title");
+    } else {
+      starErr.classList.add("show");
+      if (d.error) starBtn.title = d.error;
+      setTimeout(() => starErr.classList.remove("show"), 6000);
+    }
+    renderStarBtn();
+  });
+  /* contador inicial · initial count (API pública de GitHub) */
+  fetch("https://api.github.com/repos/686f6c61/ghlike")
+    .then((res) => (res.ok ? res.json() : null))
+    .then((info) => {
+      if (!info || typeof info.stargazers_count !== "number") return;
+      starCount = info.stargazers_count;
+      renderStarBtn();
+    })
+    .catch(() => { /* sin red o sin cuota: se queda el placeholder · offline: keep placeholder */ });
+
+  /* ---------- idioma · language ---------- */
   const TITLES = {
     es: "ghlike — stars de GitHub desde el terminal, sin tokens",
     en: "ghlike — GitHub stars from your terminal, no tokens",
@@ -20,6 +71,7 @@
     document.title = TITLES[lang];
     document.getElementById("lang-es").classList.toggle("on", lang === "es");
     document.getElementById("lang-en").classList.toggle("on", lang === "en");
+    renderStarBtn();
     try { localStorage.setItem("ghlike-site-lang", lang); } catch (e) {}
   }
   document.getElementById("lang-es").addEventListener("click", () => setLang("es"));
@@ -84,15 +136,4 @@
     }, { rootMargin: "-40% 0px -55% 0px" });
     chipMap.forEach((_, s) => io.observe(s));
   }
-
-  /* ---------- contador de stars del repo (API pública de GitHub) ---------- */
-  const starsEl = document.getElementById("gh-stars");
-  fetch("https://api.github.com/repos/686f6c61/ghlike")
-    .then((res) => (res.ok ? res.json() : null))
-    .then((info) => {
-      if (!info || typeof info.stargazers_count !== "number") return;
-      const locale = html.getAttribute("lang") === "es" ? "es-ES" : "en-US";
-      starsEl.textContent = info.stargazers_count.toLocaleString(locale);
-    })
-    .catch(() => { /* sin red o sin cuota: se queda el placeholder · offline: keep placeholder */ });
 })();

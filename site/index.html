@@ -156,12 +156,28 @@
   }
   .hero p.sub{font-size:clamp(16px, 2vw, 19px); color:var(--text-2); max-width:680px; margin:0 auto 30px}
   .hero .actions{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:18px}
-  .hero .stars-line{
-    display:inline-flex; align-items:center; gap:7px; margin:0 0 26px;
-    color:var(--text-2); font-size:14.5px; font-weight:500;
+
+  /* ---------- botón de star del hero (estilo botón Star de GitHub) ---------- */
+  .starbtn{
+    display:inline-flex; align-items:center; gap:8px; margin:0 0 10px;
+    padding:8px 16px; border-radius:8px; border:1px solid var(--border-strong);
+    background:var(--surface); color:var(--text);
+    font:inherit; font-size:14.5px; font-weight:600; cursor:pointer;
+    transition:background .15s, border-color .15s, box-shadow .15s, opacity .15s;
   }
-  .hero .stars-line svg{width:16px; height:16px; color:var(--star)}
-  .hero .stars-line:hover{text-decoration:none; color:var(--primary)}
+  .starbtn:hover{background:var(--bg-soft); border-color:var(--primary); box-shadow:var(--shadow)}
+  .starbtn .star-ic{width:16px; height:16px; color:var(--text-2); transition:color .15s}
+  .starbtn .count{font-variant-numeric:tabular-nums; color:var(--text-2)}
+  .starbtn.liked{background:#fff8c5; border-color:#d4a72c}
+  .starbtn.liked .star-ic{color:var(--star)}
+  html[data-theme="dark"] .starbtn.liked{background:rgba(210,153,34,.15); border-color:#9e6a03}
+  .starbtn[data-busy="1"]{opacity:.55; pointer-events:none}
+  .starbtn[data-busy="1"] .star-ic{animation:ghlike-pulse 1s infinite}
+  @keyframes ghlike-pulse{50%{opacity:.3}}
+  .star-note{display:block; max-width:600px; margin:0 auto 26px; font-size:13px; color:var(--text-2)}
+  .star-error{display:none; margin:0 0 26px; font-size:13px; color:#cf222e}
+  .star-error.show{display:block}
+  html[data-theme="dark"] .star-error{color:#ff7b72}
   .btn{
     display:inline-flex; align-items:center; gap:8px; border-radius:999px; cursor:pointer;
     padding:13px 26px; font-size:15.5px; font-weight:600; text-decoration:none; border:1px solid transparent;
@@ -347,10 +363,19 @@
       <span class="en">View on GitHub</span>
     </a>
   </div>
-  <a class="stars-line" id="gh-stars-link" href="https://github.com/686f6c61/ghlike/stargazers" target="_blank" rel="noopener">
-    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
-    <span><strong id="gh-stars">·</strong> stars — 686f6c61/ghlike</span>
-  </a>
+  <button class="starbtn" id="star-btn" type="button" data-ghlike-repo="686f6c61/ghlike" aria-pressed="false">
+    <svg class="star-ic" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z"/></svg>
+    <span class="lbl" id="star-lbl">Like</span>
+    <span class="count" id="gh-stars">·</span>
+  </button>
+  <p class="star-note">
+    <span class="es">Con <a href="https://github.com/686f6c61/ghlike/tree/main/extension" target="_blank" rel="noopener">la extensión ghlike</a> instalada, este botón da y quita la estrella sin salir de la página; sin ella, abre el repo en una pestaña nueva.</span>
+    <span class="en">With <a href="https://github.com/686f6c61/ghlike/tree/main/extension" target="_blank" rel="noopener">the ghlike extension</a> installed, this button stars and unstars without leaving the page; without it, it opens the repo in a new tab.</span>
+  </p>
+  <p class="star-error" id="star-error" role="alert">
+    <span class="es">No se pudo completar — inténtalo de nuevo.</span>
+    <span class="en">Couldn’t complete the action — please try again.</span>
+  </p>
   <div class="chips" id="chips">
     <a class="chip" href="#install" data-target="install">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2l-1.5 6.5H17l-7 13 1.5-7.5H6L13 2z"/></svg>
@@ -641,6 +666,17 @@ unstar(<span class="c">"vercel/next.js"</span>, browser=<span class="c">"brave"<
         PyPI
       </h4>
       <p><a href="https://pypi.org/project/ghlike/" target="_blank" rel="noopener">pypi.org/project/ghlike</a></p>
+    </div>
+    <div class="card icard">
+      <h4>
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 11H19V7a2 2 0 00-2-2h-4V3.5a2.5 2.5 0 00-5 0V5H4a2 2 0 00-2 2v3.8h1.5a2.7 2.7 0 010 5.4H2V20a2 2 0 002 2h3.8v-1.5a2.7 2.7 0 015.4 0V22H17a2 2 0 002-2v-4h1.5a2.5 2.5 0 000-5z"/></svg>
+        <span class="es">Extensión</span><span class="en">Extension</span>
+      </h4>
+      <p>
+        <span class="es">Opcional: el botón de arriba da/quita la estrella con un clic, sin salir de la página.</span>
+        <span class="en">Optional: the button above stars/unstars with one click, without leaving the page.</span>
+      </p>
+      <p><a href="https://github.com/686f6c61/ghlike/tree/main/extension" target="_blank" rel="noopener">github.com/686f6c61/ghlike · extension/</a></p>
     </div>
   </div>
 </section>
