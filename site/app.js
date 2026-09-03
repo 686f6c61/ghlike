@@ -1,7 +1,7 @@
 /* ============================================================
    ghlike — landing: idioma, tema, copiar, scrollspy, botón de
-   star del hero (extensión o pestaña nueva) y contador de
-   stars (API pública de GitHub). Cero dependencias.
+   star del hero (daemon local del CLI o pestaña nueva) y
+   contador de stars (API pública de GitHub). Cero dependencias.
    ============================================================ */
 (() => {
   "use strict";
@@ -11,19 +11,24 @@
 
   const html = document.documentElement;
 
-  /* ---------- botón de star del hero (con o sin extensión) ----------
-     Contrato con la extensión ghlike: si está instalada, su content
-     script marca el botón con data-ghlike-ext="1", intercepta el clic,
-     pone data-busy="1" durante la acción (~2-4 s) y al terminar
-     despacha CustomEvent("ghlike:update", {detail:{ok,starred,error}}).
-     Sin extensión, el clic abre el repo en una pestaña nueva.        */
+  /* ---------- botón de star del hero (daemon local del CLI) ----------
+     Si el visitante tiene el CLI instalado y `ghlike daemon` corriendo
+     (http://127.0.0.1:8469), el botón da/quita la estrella sin salir
+     de la página (~8-12 s: pulsa el Star real con su navegador).
+     Sin daemon, el clic abre el repo en una pestaña nueva.
+     Sonda moderada: un probe al cargar y, si falla, reintentos con
+     backoff 4 s → 8 s → 16 s → 32 s y se para. Al hacer click se
+     re-sondea una vez antes de caer al fallback (por si el daemon
+     se acaba de arrancar).                                          */
   const starBtn = document.getElementById("star-btn");
   const starLbl = document.getElementById("star-lbl");
   const starErr = document.getElementById("star-error");
   const starsEl = document.getElementById("gh-stars");
   const LBL = { es: ["Like", "Liked"], en: ["Like", "Liked"] };
+  const DAEMON = "http://127.0.0.1:8469";
   let starred = false;   // sin sesión no se puede saber el estado inicial
   let starCount = null;
+  let daemonAlive = false;
   function renderStarBtn() {
     const lang = html.getAttribute("lang") === "en" ? "en" : "es";
     starLbl.textContent = LBL[lang][starred ? 1 : 0];
@@ -32,23 +37,58 @@
     if (starCount !== null)
       starsEl.textContent = starCount.toLocaleString(lang === "es" ? "es-ES" : "en-US");
   }
-  starBtn.addEventListener("click", () => {
-    if (starBtn.getAttribute("data-ghlike-ext") === "1") return; // lo gestiona la extensión
-    window.open("https://github.com/" + starBtn.getAttribute("data-ghlike-repo"), "_blank", "noopener");
-  });
-  starBtn.addEventListener("ghlike:update", (ev) => {
-    const d = ev.detail || {};
-    if (d.ok) {
-      starred = !!d.starred;
-      if (starCount !== null) starCount = Math.max(0, starCount + (starred ? 1 : -1));
-      starErr.classList.remove("show");
-      starBtn.removeAttribute("title");
-    } else {
-      starErr.classList.add("show");
-      if (d.error) starBtn.title = d.error;
-      setTimeout(() => starErr.classList.remove("show"), 6000);
+  async function pingDaemon() {
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 1500);
+      const res = await fetch(DAEMON + "/ping", { signal: ctl.signal });
+      clearTimeout(t);
+      const info = await res.json().catch(() => null);
+      return !!(res.ok && info && info.ok && info.service === "ghlike-daemon");
+    } catch (e) { return false; }
+  }
+  (async function probeDaemon() {
+    if (await pingDaemon()) { daemonAlive = true; return; }
+    for (const wait of [4000, 8000, 16000, 32000]) {
+      await new Promise((r) => setTimeout(r, wait));
+      if (await pingDaemon()) { daemonAlive = true; return; }
     }
-    renderStarBtn();
+  })();
+  function showStarError(detail) {
+    starErr.classList.add("show");
+    if (detail) starBtn.title = detail;
+    setTimeout(() => starErr.classList.remove("show"), 6000);
+  }
+  starBtn.addEventListener("click", async () => {
+    if (starBtn.getAttribute("data-busy") === "1") return;
+    if (!daemonAlive) daemonAlive = await pingDaemon();
+    if (!daemonAlive) {
+      window.open("https://github.com/" + starBtn.getAttribute("data-ghlike-repo"), "_blank", "noopener");
+      return;
+    }
+    starBtn.setAttribute("data-busy", "1");
+    try {
+      const res = await fetch(DAEMON + "/toggle", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo: starBtn.getAttribute("data-ghlike-repo") }),
+      });
+      const info = await res.json().catch(() => null);
+      if (res.ok && info && info.ok) {
+        starred = !!info.starred;
+        if (starCount !== null) starCount = Math.max(0, starCount + (starred ? 1 : -1));
+        starErr.classList.remove("show");
+        starBtn.removeAttribute("title");
+      } else {
+        showStarError((info && (info.error || info.message)) || ("HTTP " + res.status));
+      }
+    } catch (e) {
+      daemonAlive = false; // daemon caído a mitad: la próxima vez, fallback
+      showStarError(String((e && e.message) || e));
+    } finally {
+      starBtn.removeAttribute("data-busy");
+      renderStarBtn();
+    }
   });
   /* contador inicial · initial count (API pública de GitHub) */
   fetch("https://api.github.com/repos/686f6c61/ghlike")
