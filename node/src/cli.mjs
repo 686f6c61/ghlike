@@ -4,7 +4,7 @@ import { findSessions } from './browsers.mjs';
 import { GhlikeError, NoSessionError, RepoNotFoundError, run } from './core.mjs';
 
 const EXIT_OK = 0, EXIT_ERROR = 1, EXIT_NO_SESSION = 2, EXIT_NOT_FOUND = 3;
-const VERSION = '0.1.3';
+const VERSION = '0.2.0';
 
 const HELP = `ghlike ${VERSION} — like (star) en GitHub con tu sesión del navegador, sin tokens
 
@@ -60,13 +60,6 @@ async function listSessions(asJson) {
 const args = parseArgs(process.argv.slice(2));
 
 async function main() {
-  if (args.repo === 'daemon') {
-    // subcomando: servidor local para el widget <gh-like>
-    const { start } = await import('./daemon.mjs');
-    const i = process.argv.indexOf('--port');
-    start(i !== -1 ? Number(process.argv[i + 1]) : undefined);
-    return;
-  }
   if (args.list) process.exit(await listSessions(args.asJson));
   if (!args.repo) { console.error(HELP); process.exit(EXIT_ERROR); }
 

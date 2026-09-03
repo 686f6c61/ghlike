@@ -1,11 +1,12 @@
-// Orquestación: sesión del navegador -> navegador headless con CDP -> click en Star.
+// Orquestación: sesión del navegador -> navegador headless con CDP por pipe
+// (--remote-debugging-pipe, sin puerto TCP) -> click en Star.
 // El "like" se hace clicando el botón real de github.com con la sesión del
 // usuario. Sin tokens ni API: las cookies cifradas se copian a un perfil
 // temporal local y se borran al terminar.
-import { spawn } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import { copySession, findSessions, BROWSERS } from './browsers.mjs';
-import { freePort, openTab, Tab, waitForCdp } from './cdp.mjs';
+import { CdpPipe, openPage, waitReady } from './cdp.mjs';
 
 const REPO_RE = /^[\w.\-]+\/[\w.\-]+$/;
 const URL_RE = /github\.com\/([\w.\-]+)\/([\w.\-]+)/;
@@ -44,16 +45,16 @@ export function parseRepo(text) {
   throw new GhlikeError(`formato esperado 'owner/repo' o URL de GitHub: ${text}`);
 }
 
-async function waitReady(tab, timeoutMs = 25000) {
+async function waitLoaded(page, timeoutMs = 25000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    try { if (await tab.eval('document.readyState') === 'complete') return; } catch {}
+    try { if (await page.eval('document.readyState') === 'complete') return; } catch {}
     await new Promise(r => setTimeout(r, 400));
   }
   throw new GhlikeError('la pagina no termino de cargar');
 }
 
-async function readState(tab, timeoutMs = 20000) {
+async function readState(page, timeoutMs = 20000) {
   // Espera al login Y al botón: en repos grandes el header de React puede
   // hidratarse después del meta de login, y comprobar antes da un falso
   // "markup cambió".
@@ -61,7 +62,7 @@ async function readState(tab, timeoutMs = 20000) {
   let st = {};
   while (Date.now() < deadline) {
     try {
-      st = (await tab.eval(STATE_JS)) || {};
+      st = (await page.eval(STATE_JS)) || {};
       if (st.login && (st.found || st.notFound)) return st;
     } catch {}
     await new Promise(r => setTimeout(r, 500));
@@ -70,6 +71,12 @@ async function readState(tab, timeoutMs = 20000) {
 }
 
 async function killTree(proc) {
+  if (process.platform === 'win32') {
+    // process.kill(-pid) es POSIX-only; en Windows se mata el arbol con taskkill
+    try { execFileSync('taskkill', ['/pid', String(proc.pid), '/T', '/F'], { stdio: 'ignore' }); }
+    catch { try { proc.kill(); } catch {} }
+    return;
+  }
   // Mata el grupo completo: /snap/bin/brave es un wrapper y el binario real
   // queda huérfano si solo se mata el Popen (y seguiría escribiendo en tmp).
   for (const sig of ['SIGTERM', 'SIGKILL']) {
@@ -87,6 +94,9 @@ async function rmRetry(tmp, attempts = 4) {
     if (!fs.existsSync(tmp)) return;
     await new Promise(r => setTimeout(r, 500));
   }
+  // El perfil temporal contiene una copia cifrada de las cookies: si no se
+  // pudo borrar, avisar con la ruta para que el usuario lo haga a mano.
+  process.stderr.write(`ghlike: aviso: no se pudo borrar el perfil temporal, eliminalo a mano: ${tmp}\n`);
 }
 
 export async function run(repo, { action = 'star', browser = null } = {}) {
@@ -106,25 +116,25 @@ export async function run(repo, { action = 'star', browser = null } = {}) {
   let lastSessionFailure = null;
   for (const session of sessions) {
     const tmp = copySession(session);
-    const port = await freePort();
     const proc = spawn(session.exe, [
       '--headless=new', '--disable-gpu', '--no-first-run',
       '--no-default-browser-check', '--disable-component-update',
       `--user-data-dir=${tmp}`,
       `--profile-directory=${session.profileName}`,
-      `--remote-debugging-port=${port}`,
+      '--remote-debugging-pipe',
       'about:blank',
-    ], { stdio: 'ignore', detached: true });
+    ], { stdio: ['ignore', 'ignore', 'ignore', 'pipe', 'pipe'], detached: true });
     proc.unref();
+    const pipe = new CdpPipe(proc);
 
     try {
-      const up = await waitForCdp(port);
-      if (!up || proc.exitCode !== null) throw new GhlikeError(`${session.browser.label} no arranco con el puerto de depuracion`);
-      const tab = new Tab(await openTab(port, `https://github.com/${repo}`));
+      const up = await waitReady(pipe);
+      if (!up || proc.exitCode !== null) throw new GhlikeError(`${session.browser.label} no arranco con el pipe de depuracion`);
+      const page = await openPage(pipe, `https://github.com/${repo}`);
       try {
-        await waitReady(tab);
+        await waitLoaded(page);
         await new Promise(r => setTimeout(r, 2000)); // margen para la hidratacion de React
-        const st = await readState(tab);
+        const st = await readState(page);
 
         if (st.notFound) throw new RepoNotFoundError(`el repo ${repo} no existe (o no es visible)`);
         if (!st.login) {
@@ -139,21 +149,22 @@ export async function run(repo, { action = 'star', browser = null } = {}) {
 
         const desired = action === 'toggle' ? !before : action === 'star';
         if (before !== desired) {
-          if (!(await tab.eval(CLICK_JS))) throw new GhlikeError('el boton de star desaparecio antes del click');
+          if (!(await page.eval(CLICK_JS))) throw new GhlikeError('el boton de star desaparecio antes del click');
           let flipped = false;
           const deadline = Date.now() + 15000;
           while (Date.now() < deadline) {
             await new Promise(r => setTimeout(r, 600));
-            const st2 = await readState(tab);
+            const st2 = await readState(page);
             if (!!st2.starred === desired) { flipped = true; break; }
           }
           if (!flipped) throw new GhlikeError('el click no cambio el estado del star (rate limit o cambio de UI)');
         }
         return { ...result, action, after: desired, changed: before !== desired };
       } finally {
-        tab.close();
+        await page.close();
       }
     } finally {
+      pipe.close();
       await killTree(proc);
       await rmRetry(tmp);
     }

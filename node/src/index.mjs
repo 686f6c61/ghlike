@@ -1,4 +1,4 @@
-// API publica de ghlike para Node >= 22 (usa el WebSocket nativo, cero deps).
+// API publica de ghlike para Node >= 22 (CDP por pipe, cero deps).
 import { check, GhlikeError, NoSessionError, RepoNotFoundError, run, star, toggle, unstar } from './core.mjs';
 import { findSessions } from './browsers.mjs';
 

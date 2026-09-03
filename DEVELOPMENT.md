@@ -1,116 +1,72 @@
 # ghlike — Developer guide
 
 Architecture, protocols, local setup, testing and the release runbook for
-this repo (widget + extension + Node CLI/daemon). The Python twin lives in
+this repo (the Node CLI + library). The Python twin lives in
 [686f6c61/ghlike-py](https://github.com/686f6c61/ghlike-py).
 
 ## Architecture
 
 ```
-                    ┌────────────────────────────────────────────┐
-   ANY WEBSITE      │                VISITOR'S MACHINE            │
-┌───────────────┐   │  ┌─────────────┐        ┌───────────────┐   │
-│ <gh-like      │   │  │  EXTENSION  │        │  ghlike       │   │
-│  repo="a/b">  │◄──┼──┤  (MV3)      │        │  daemon       │   │
-│               │   │  │             │        │ (127.0.0.1)   │   │
-└───────────────┘   │  │ bridge ─────┼──► bg ─┼──► core.mjs    │   │
-       │  fallback  │  │ (all sites) │  tab   │  (node/src/)  │   │
-       ▼  (no ext)  │  │ github-star │◄─close─┴──────┬────────┘   │
-   open repo        │  └─────────────┘               │            │
-                    │         copy encrypted cookies → headless    │
-                    │         browser (CDP) → click the REAL star  │
-                    │         button → clean up                    │
-                    └────────────────────────────────────────────┘
+  USER'S TERMINAL
+┌───────────────┐
+│ ghlike CLI    │   node/src/cli.mjs (zero-dep arg parser)
+│  └─ core.mjs  │──► findSessions() → copy encrypted cookies to temp profile
+│       │       │──► spawn user's browser headless
+│       │       │      --remote-debugging-pipe (NO TCP port)
+│       ▼       │──► CDP over fds 3/4 (NUL-delimited JSON) ──► browser
+│  click Star   │      Target.createTarget → attach (flatten) →
+│  + verify     │      Runtime.evaluate (STATE_JS / CLICK_JS)
+│       │       │──► kill process tree, delete temp profile
+└───────┴───────┘
 ```
 
-Three delivery vehicles, one engine. The core trick, identical everywhere:
-**we never decrypt anything.** The encrypted cookie store is copied to a
-throwaway profile and opened by the user's own browser, which clicks the
-star button exactly like a human would (GitHub's own React handles the
-CSRF). No tokens exist anywhere.
+The core trick: **we never decrypt anything.** The encrypted cookie store is
+copied to a throwaway profile and opened by the user's own browser, which
+clicks the star button exactly like a human would (GitHub's own React handles
+the CSRF). No tokens exist anywhere. And because CDP travels over a private
+pair of pipes instead of a TCP debug port, no other local process can attach
+to the debugging channel.
 
 ## File map
 
 ```
-node/src/widget.js             web component <gh-like>: variants, CSS vars,
-                               count cache, click chain (ships as ghlike/widget)
-extension/manifest.json        MV3 manifest (host: github.com)
-extension/widget-bridge.js     content script (all sites): marks widgets,
-                               intercepts clicks, talks to background
-extension/github-star.js       content script (github.com): #ghlike-* actions,
-                               click + verify + report
-extension/background.js        service worker: tab lifecycle, request queue
 node/src/browsers.mjs          browser/profile discovery, session copy
-node/src/cdp.mjs               freePort/waitForCdp/openTab/Tab (native WebSocket)
+node/src/cdp.mjs               CdpPipe (CDP over --remote-debugging-pipe),
+                               waitReady, openPage (Target.attach flatten)
 node/src/core.mjs              orchestration: STATE_JS/CLICK_JS selectors,
                                session loop, kill-tree + cleanup
-node/src/cli.mjs               zero-dep arg parser + `daemon` subcommand
-node/src/daemon.mjs            localhost HTTP server wrapping core.run()
+node/src/cli.mjs               zero-dep arg parser, exit codes, --list
 node/src/index.mjs             library exports (star/unstar/check/toggle)
-demo/index.html                variants showcase + playground + live target
 ```
 
 ## Protocols
 
-### Widget ↔ Extension (DOM attributes only)
+### How a star is given
 
-The page-world script never touches extension APIs. Contract:
-
-| attribute on `<gh-like>` | set by | meaning |
-|--------------------------|--------|---------|
-| `data-ghlike-ext="1"` | bridge | extension present; bridge owns clicks |
-| `data-busy="1"` / removed | bridge (ext) or widget (daemon) | action in flight |
-| `data-starred="0|1"` | both | current like state after action |
-| `data-error="…"` | both | `no-session` \| `not-found` \| `timeout` \| … |
-
-Click routing (widget internal): extension present → bridge already handled
-it in capture phase → do nothing. Else daemon alive → POST /toggle. Else →
-open repo in new tab (fallback).
-
-### Extension internal (chrome.runtime messages)
-
-`{type:"ghlike:toggle"|"star"|"unstar"|"check", repo}` from bridge →
-background opens `https://github.com/{repo}#ghlike-{verb}` in a background
-tab → `github-star.js` performs and answers
-`{type:"ghlike:result", repo, ok, starred?, error?}` → background closes the
-tab and resolves the widget request. Timeout 45 s; concurrent requests for
-the same repo share one tab.
-
-### Daemon HTTP API (127.0.0.1:8469, CORS `*`)
-
-| route | body | returns |
-|-------|------|---------|
-| `GET /ping` | – | `{ok, service:"ghlike-daemon", version}` |
-| `POST /check` | `{"repo":"o/r"}` | `{ok, repo, starred, user}` |
-| `POST /star` / `POST /unstar` / `POST /toggle` | `{"repo":"o/r"}` | `{ok, repo, starred, changed, user}` |
-
-Errors: `400 bad-repo`, `404 not-found`, `409 no-session`, `500 ghlike-error`.
-Actions are queued one at a time (one browser at a time). **Trust note:**
-while the daemon runs, any page open in your browsers can request stars
-through it — dev tool only, stop it when done.
-
-### The star action itself (all paths)
-
-1. Find profile with github.com session cookies (never decrypted).
+1. Find a profile with github.com session cookies (never decrypted).
 2. Copy `Cookies`(+wal/shm), `Preferences`, `Local State` to a temp dir
    (visible in `$HOME` — snap browsers can't write hidden paths).
-3. Launch the visitor's browser headless with a private CDP port, in its own
-   process group.
-4. Navigate, wait for `document.readyState`, wait for the star button
+3. Launch the user's browser headless with `--remote-debugging-pipe` and
+   `stdio: ['ignore','ignore','ignore','pipe','pipe']`, in its own process
+   group. Chrome reads CDP commands from fd 3 and writes responses/events to
+   fd 4 — NUL-delimited UTF-8 JSON, no WebSocket, no HTTP, no TCP port.
+4. Readiness: retry `Browser.getVersion` until it answers (~10 s deadline).
+5. `Target.createTarget {url}` → `Target.attachToTarget {flatten:true}` →
+   page commands carry the top-level `sessionId` over the same pipe.
+6. Wait for `document.readyState`, wait for the star button
    (`button[aria-label^="Star"], …`), click, poll until the state flips.
-5. Kill the process **group** (the snap wrapper orphans the real binary
-   otherwise), delete the temp dir with retries.
+7. Kill the process **group** (POSIX: `process.kill(-pid)`; Windows:
+   `taskkill /pid <pid> /T /F`), close the pipes, delete the temp dir with
+   retries (if it survives, warn on stderr with the path).
 
 ## Local development
 
 ```bash
-python3 -m http.server 8123 --directory . &   # demo page
-node node/src/daemon.mjs                       # daemon
 cd node && node src/cli.mjs --list             # CLI from source
-brave --load-extension=$PWD/extension http://127.0.0.1:8123/demo/
+cd node && node src/cli.mjs owner/repo -c      # check a repo
 ```
 
-No build step, no dependencies, no transpilation. Edit and reload.
+No build step, no dependencies, no transpilation. Edit and rerun.
 
 ## Testing
 
@@ -122,26 +78,20 @@ ghlike owner/repo -c                       → correct state
 ghlike owner/repo && ghlike … -u           → star + unstar round trip
 ghlike este-no/existe -c                   → exit 3
 ghlike --browser firefox …                 → exit 2, "not supported"
-demo page: click with daemon               → "Liked", no new tab
-demo page: click with extension            → "Liked", background tab opens+closes
-demo: error card                           → "Repo not found"
-demo: retarget input                       → count + aria change
 ```
 
-Scripted E2E (the pattern used during development): launch the browser
-headless with `--remote-debugging-port` + copied session (+`--load-extension`
-to test the extension), drive it over CDP, assert DOM state. Beware the
-**anonymous GitHub API quota** (60 req/h per IP): the widget caches counts in
-`localStorage` (1 h) and dedupes in-flight requests per page.
+Smoke test for the CDP pipe (no GitHub session needed): launch Chrome
+headless with `--remote-debugging-pipe` and an empty `--user-data-dir`, then
+`Browser.getVersion`, `Target.createTarget` to `https://example.com`,
+`Runtime.evaluate` of `1+1` and `document.title`, and clean up (kill process,
+delete tempdir).
 
 ## Versioning & release runbook
 
-Versions to bump together in this repo (all currently `0.1.3`):
+Versions to bump together in this repo (currently `0.2.0`):
 
 1. `node/package.json` → `version`
 2. `node/src/cli.mjs` → `VERSION`
-3. `extension/manifest.json` → `version`
-4. `node/src/daemon.mjs` → version in the `/ping` response
 
 The Python package versions live in the
 [ghlike-py repo](https://github.com/686f6c61/ghlike-py).
@@ -150,7 +100,7 @@ Publishing is automated: **push a git tag / create a GitHub Release named
 `vX.Y.Z`** and [`.github/workflows/publish-npm.yml`](.github/workflows/publish-npm.yml)
 publishes the `ghlike` npm package. It requires the
 `NPM_TOKEN` secret (npm automation token) in repo settings. The release tag
-must match the packages' `version`.
+must match the package's `version`.
 
 ```bash
 # manual check before releasing
@@ -159,18 +109,16 @@ cd node && npm pack --dry-run
 
 ## Security model
 
-- Zero dependencies across all packages (supply-chain surface = 0).
+- Zero dependencies (supply-chain surface = 0).
 - Cookies never decrypted, never leave the machine; only the user's own
   browser ever uses them, for exactly one click.
-- Extension: host permission only for `github.com`; content scripts on
-  http/https; no tabs permission, no storage, no remote code.
-- Daemon: localhost-only, but open to any page while running (documented
-  above). Roadmap: optional token.
-- Widget: localStorage only caches public star counts (`ghlike:count:*`).
+- The CDP channel uses `--remote-debugging-pipe`: two file descriptors
+  between ghlike and the browser process. **No debug port is opened**, so no
+  other local process can attach to the debugging session.
 
 ## Roadmap
 
 - Firefox: no CDP; viable path = read plaintext `cookies.sqlite` and inject
   into a headless Chromium via CDP `Network.setCookie`.
-- CI (GitHub Actions): syntax checks + the E2E pattern with a test session.
-- Store listings for the extension; optional daemon auth token.
+- CI (GitHub Actions): syntax checks + the pipe smoke test with a test
+  session.

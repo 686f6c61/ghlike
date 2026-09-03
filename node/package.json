@@ -1,6 +1,6 @@
 {
   "name": "ghlike",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Like (star) repos on GitHub with your existing browser session — no tokens, no API keys.",
   "type": "module",
   "license": "MIT",
@@ -30,7 +30,6 @@
     "directory": "node"
   },
   "exports": {
-    ".": "./src/index.mjs",
-    "./widget": "./src/widget.js"
+    ".": "./src/index.mjs"
   }
 }
