@@ -4,7 +4,7 @@ import { findSessions } from './browsers.mjs';
 import { GhlikeError, NoSessionError, RepoNotFoundError, run } from './core.mjs';
 
 const EXIT_OK = 0, EXIT_ERROR = 1, EXIT_NO_SESSION = 2, EXIT_NOT_FOUND = 3;
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 
 const HELP = `ghlike ${VERSION} — like (star) en GitHub con tu sesión del navegador, sin tokens
 
@@ -14,10 +14,31 @@ Uso:
   ghlike owner/repo -c         solo consultar
   ghlike owner/repo --toggle   invertir el estado
   ghlike --list                sesiones de GitHub detectadas
+  ghlike daemon                servidor local (127.0.0.1:8469) para la landing
 Opciones:
   --browser NOMBRE   forzar navegador (brave, chrome, chromium, edge, vivaldi, opera)
   --json             salida en JSON
   -h, --help         ayuda    -v, --version  version`;
+
+// subcomando antes de parseArgs: un repo llamado "daemon" debe seguir funcionando
+if (process.argv[2] === 'daemon') {
+  const { start, DEFAULT_PORT } = await import('./daemon.mjs');
+  const argv = process.argv.slice(3);
+  const allowOrigins = [];
+  let port = DEFAULT_PORT;
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i] === '--port') port = Number(argv[++i]);
+    else if (argv[i] === '--allow-origin' && argv[i + 1]) allowOrigins.push(argv[++i]);
+  }
+  try {
+    start(port, { allowOrigins });
+  } catch (e) {
+    console.error(`ghlike: ${e.message}`);
+    process.exit(EXIT_ERROR);
+  }
+} else {
+
+const args = parseArgs(process.argv.slice(2));
 
 function parseArgs(argv) {
   const args = { action: 'star', browser: null, asJson: false, list: false, repo: null };
@@ -57,8 +78,6 @@ async function listSessions(asJson) {
   return EXIT_OK;
 }
 
-const args = parseArgs(process.argv.slice(2));
-
 async function main() {
   if (args.list) process.exit(await listSessions(args.asJson));
   if (!args.repo) { console.error(HELP); process.exit(EXIT_ERROR); }
@@ -81,4 +100,5 @@ try {
   if (e instanceof GhlikeError) { console.error(`ghlike: ${e.message}`); process.exit(EXIT_ERROR); }
   console.error('ghlike: error inesperado:', e);
   process.exit(EXIT_ERROR);
+}
 }

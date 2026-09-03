@@ -41,6 +41,7 @@ ghlike owner/repo --toggle   # flip
 ghlike --list                # github.com sessions found in your browsers
 ghlike --browser brave o/r   # force one browser (strict — fails if it has no session)
 ghlike o/r --json            # machine-readable output
+ghlike daemon                # local server (127.0.0.1:8469) for the ghlike landing
 ```
 
 Example:
@@ -72,6 +73,28 @@ await toggle("denoland/deno");
 ```
 
 Errors: `NoSessionError`, `RepoNotFoundError`, `GhlikeError`.
+
+## Daemon
+
+`ghlike daemon` serves `127.0.0.1:8469` so the like button on the project
+landing ([ghlike.686f6c61.dev](https://ghlike.686f6c61.dev)) works with **one
+click**, no browser extension needed:
+
+| route | body | returns |
+|-------|------|---------|
+| `GET /ping` | – | `{ok, service:"ghlike-daemon", version}` |
+| `POST /check` | `{"repo":"o/r"}` | `{ok, repo, starred, changed, user}` |
+| `POST /star` / `POST /unstar` / `POST /toggle` | `{"repo":"o/r"}` | `{ok, repo, starred, changed, user}` |
+
+Errors: `400 bad-repo` · `403 bad-origin|bad-host` · `404 not-found` ·
+`409 no-session` · `429 queue-full` · `500 ghlike-error`. Actions are queued
+one at a time (max 4 pending).
+
+**Security note:** the daemon only executes requests whose `Origin` is
+`https://ghlike.686f6c61.dev` or localhost — any other website gets
+`403 bad-origin` and nothing runs (the origin allowlist gates execution, not
+just CORS; Host header is validated against DNS-rebinding). Extra origins can
+be added with repeated `--allow-origin <url>` flags. Stop it when done.
 
 ## How it works
 
@@ -123,6 +146,7 @@ ghlike owner/repo --toggle   # invertir
 ghlike --list                # sesiones de github.com detectadas en tus navegadores
 ghlike --browser brave o/r   # forzar un navegador (estricto — falla si no tiene sesión)
 ghlike o/r --json            # salida para scripts
+ghlike daemon                # servidor local (127.0.0.1:8469) para la landing
 ```
 
 Ejemplo:
@@ -147,6 +171,29 @@ await toggle("denoland/deno");
 ```
 
 Errores: `NoSessionError`, `RepoNotFoundError`, `GhlikeError`.
+
+## Daemon
+
+`ghlike daemon` sirve `127.0.0.1:8469` para que el botón de like de la
+landing del proyecto ([ghlike.686f6c61.dev](https://ghlike.686f6c61.dev))
+funcione **con un clic**, sin extensión de navegador:
+
+| ruta | body | devuelve |
+|------|------|----------|
+| `GET /ping` | – | `{ok, service:"ghlike-daemon", version}` |
+| `POST /check` | `{"repo":"o/r"}` | `{ok, repo, starred, changed, user}` |
+| `POST /star` / `POST /unstar` / `POST /toggle` | `{"repo":"o/r"}` | `{ok, repo, starred, changed, user}` |
+
+Errores: `400 bad-repo` · `403 bad-origin|bad-host` · `404 not-found` ·
+`409 no-session` · `429 queue-full` · `500 ghlike-error`. Las acciones van en
+cola de una en una (máx. 4 pendientes).
+
+**Aviso de seguridad:** el daemon solo ejecuta peticiones cuyo `Origin` sea
+`https://ghlike.686f6c61.dev` o localhost — cualquier otra web recibe
+`403 bad-origin` y no se ejecuta nada (la allowlist de origen gobierna la
+ejecución, no solo el CORS; el header Host se valida contra DNS-rebinding).
+Se pueden añadir orígenes con `--allow-origin <url>` repetido. Páralo al
+acabar.
 
 ## Cómo funciona
 

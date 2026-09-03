@@ -70,7 +70,21 @@ async function readState(page, timeoutMs = 20000) {
   return st;
 }
 
-async function killTree(proc) {
+// PIDs cuyo cmdline referencia el perfil temporal: con navegadores snap el
+// binario real escapa del grupo de procesos (snap-confine), y la unica forma
+// fiable de localizarlo es por el --user-data-dir con que se lanzo.
+function pidsOnTmp(tmp) {
+  const pids = [];
+  for (const name of fs.readdirSync('/proc')) {
+    if (!/^\d+$/.test(name)) continue;
+    try {
+      if (fs.readFileSync(`/proc/${name}/cmdline`, 'utf8').includes(`--user-data-dir=${tmp}\0`)) pids.push(Number(name));
+    } catch {}
+  }
+  return pids;
+}
+
+async function killTree(proc, tmp) {
   if (process.platform === 'win32') {
     // process.kill(-pid) es POSIX-only; en Windows se mata el arbol con taskkill
     try { execFileSync('taskkill', ['/pid', String(proc.pid), '/T', '/F'], { stdio: 'ignore' }); }
@@ -80,11 +94,19 @@ async function killTree(proc) {
   // Mata el grupo completo: /snap/bin/brave es un wrapper y el binario real
   // queda huérfano si solo se mata el Popen (y seguiría escribiendo en tmp).
   for (const sig of ['SIGTERM', 'SIGKILL']) {
-    try { process.kill(-proc.pid, sig); } catch { return; }
+    try { process.kill(-proc.pid, sig); } catch { break; }
     for (let i = 0; i < 50; i++) {
       await new Promise(r => setTimeout(r, 100));
-      try { process.kill(-proc.pid, 0); } catch { return; }
+      try { process.kill(-proc.pid, 0); } catch { break; }
     }
+  }
+  // Barrido por cmdline para los procesos que escaparon del grupo (snap):
+  // si se les deja vivos, recrean el perfil temporal DESPUES de borrarlo.
+  for (let i = 0; i < 100; i++) {
+    const pids = pidsOnTmp(tmp);
+    if (!pids.length) return;
+    for (const pid of pids) { try { process.kill(pid, i < 50 ? 'SIGTERM' : 'SIGKILL'); } catch {} }
+    await new Promise(r => setTimeout(r, 100));
   }
 }
 
@@ -165,7 +187,7 @@ export async function run(repo, { action = 'star', browser = null } = {}) {
       }
     } finally {
       pipe.close();
-      await killTree(proc);
+      await killTree(proc, tmp);
       await rmRetry(tmp);
     }
   }

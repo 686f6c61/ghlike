@@ -45,7 +45,13 @@ ghlike vercel/next.js --toggle         # flip
 ghlike --list                          # GitHub sessions found in your browsers
 ghlike --browser brave vercel/next.js  # force one browser
 ghlike vercel/next.js --json           # machine-readable
+ghlike daemon                          # local server for one-click likes on the landing
 ```
+
+Running `ghlike daemon` (127.0.0.1:8469) lets the like button on the project
+landing ([ghlike.686f6c61.dev](https://ghlike.686f6c61.dev)) star with **one
+click** — it only answers to the landing and localhost; any other website
+gets a 403.
 
 Exit codes: `0` ok (incl. nothing-to-do) · `1` generic error · `2` no
 github.com session · `3` repo not found.
@@ -60,17 +66,6 @@ await unstar("vercel/next.js", { browser: "brave" }); // force a browser
 ```
 
 Errors: `NoSessionError`, `RepoNotFoundError`, `GhlikeError`.
-
-## Optional extension — for the landing
-
-The repo also ships a small [browser extension](extension/) whose only job is
-to make the like button on the project landing
-([ghlike.686f6c61.dev](https://ghlike.686f6c61.dev)) work with **one click**,
-using your github.com session. Minimal permissions: content scripts on
-exactly two origins (`ghlike.686f6c61.dev` and `github.com`), no `tabs`
-permission, no storage, no remote code. Development install: `Load unpacked`
-on `extension/` from `chrome://extensions`. The npm/PyPI packages do **not**
-include it — they remain CLI-only.
 
 ## How it works
 
@@ -138,7 +133,13 @@ ghlike vercel/next.js --toggle         # invertir
 ghlike --list                          # sesiones detectadas
 ghlike --browser brave vercel/next.js  # forzar navegador
 ghlike vercel/next.js --json           # salida para scripts
+ghlike daemon                          # servidor local para likes con un clic en la landing
 ```
+
+Con `ghlike daemon` corriendo (127.0.0.1:8469), el botón de like de la
+landing del proyecto ([ghlike.686f6c61.dev](https://ghlike.686f6c61.dev)) da
+el star **con un clic** — solo responde a la landing y a localhost; cualquier
+otra web recibe un 403.
 
 Códigos de salida: `0` ok (también "nada que hacer") · `1` error genérico ·
 `2` sin sesión de github.com · `3` repo no encontrado.
@@ -153,17 +154,6 @@ await unstar("vercel/next.js", { browser: "brave" }); // forzar navegador
 ```
 
 Errores: `NoSessionError`, `RepoNotFoundError`, `GhlikeError`.
-
-## Extensión opcional — para la landing
-
-El repo incluye también una pequeña [extensión de navegador](extension/) cuya
-única función es que el botón de like de la landing del proyecto
-([ghlike.686f6c61.dev](https://ghlike.686f6c61.dev)) funcione **con un clic**,
-usando tu sesión de github.com. Permisos mínimos: content scripts en
-exactamente dos orígenes (`ghlike.686f6c61.dev` y `github.com`), sin permiso
-de pestañas, sin storage, sin código remoto. Instalación de desarrollo:
-«Cargar descomprimida» sobre `extension/` desde `chrome://extensions`. Los
-paquetes npm/PyPI **no** la incluyen — siguen siendo solo CLI.
 
 ## Cómo funciona
 
