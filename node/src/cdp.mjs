@@ -80,6 +80,7 @@ export async function openPage(pipe, url) {
   const { result: { targetId } } = await pipe.send('Target.createTarget', { url });
   const { result: { sessionId } } = await pipe.send('Target.attachToTarget', { targetId, flatten: true });
   return {
+    send(method, params = {}) { return pipe.send(method, params, sessionId); },
     async eval(expression) {
       const res = await pipe.send('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true }, sessionId);
       if (res.result?.exceptionDetails) throw new Error('JS fallo: ' + (res.result.exceptionDetails?.exception?.description || '').slice(0, 200));

@@ -37,6 +37,8 @@ node/src/core.mjs              orchestration: STATE_JS/CLICK_JS selectors,
                                session loop, kill-tree + cleanup
 node/src/cli.mjs               zero-dep arg parser, exit codes, --list
 node/src/index.mjs             library exports (star/unstar/check/toggle)
+extension/                     landing-only MV3 extension (2 origins:
+                               ghlike.686f6c61.dev bridge + github.com star)
 ```
 
 ## Protocols
@@ -78,6 +80,8 @@ ghlike owner/repo -c                       → correct state
 ghlike owner/repo && ghlike … -u           → star + unstar round trip
 ghlike este-no/existe -c                   → exit 3
 ghlike --browser firefox …                 → exit 2, "not supported"
+load extension/ unpacked, open the landing → click the like button: star
+                                             toggles, ghlike:update fires
 ```
 
 Smoke test for the CDP pipe (no GitHub session needed): launch Chrome
@@ -92,6 +96,7 @@ Versions to bump together in this repo (currently `0.2.0`):
 
 1. `node/package.json` → `version`
 2. `node/src/cli.mjs` → `VERSION`
+3. `extension/manifest.json` → `version`
 
 The Python package versions live in the
 [ghlike-py repo](https://github.com/686f6c61/ghlike-py).
